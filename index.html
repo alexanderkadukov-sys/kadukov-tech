@@ -83,6 +83,9 @@ body{--bg:#f9fafb;--surface:#fff;--ink:#17222e;--muted:#5e6b79;--line:#dfe5eb;--
 .quick-result{display:flex;flex-direction:column;gap:2px;width:100%;padding:8px 10px;border:0;border-radius:6px;background:var(--surface);text-align:left;color:var(--ink);font-size:14px}
 .quick-result:hover,.quick-result:focus-visible{background:var(--soft)}
 .quick-result span{color:var(--muted);font-size:12px}
+.quick-result .quick-price-heading{display:flex;flex-wrap:wrap;justify-content:space-between;gap:3px 12px;color:var(--ink);font-size:inherit}
+.quick-result .quick-price{color:var(--blue);font-weight:700;white-space:nowrap}
+.quick-info-answer .price-amount{color:var(--blue);font-size:1.5rem;font-weight:700}
 .quick-status{margin:4px 1px 0;color:var(--muted);font-size:12px}
 .quick-status:empty,.quick-results[hidden]{display:none}
 .quick-status:not(:empty)+.quick-results{top:calc(100% + 4px)}
@@ -231,7 +234,7 @@ html{scroll-padding-top:120px}
 <div class="quick-info-index" id="quickInfoIndex"></div>
 <div class="quick-info-answer" id="quickInfoAnswer"></div>
 <button type="button" id="quickInfoBack" data-quick-info hidden>Все вопросы</button>
-<div class="quick-info-footer"><a class="btn alt" href="tel:+79156484238">Позвонить</a><a class="btn alt" href="https://t.me/Kaduk0v" target="_blank" rel="noopener">Telegram</a><a class="btn alt" href="https://vk.ru/phoneugra" target="_blank" rel="noopener">ВКонтакте</a><a class="btn" href="#order" data-focus>Описать задачу</a></div>
+<div class="quick-info-footer"><a class="btn alt" href="tel:+79156484238">Позвонить</a><a class="btn alt" href="https://t.me/Kaduk0v" target="_blank" rel="noopener">Telegram</a><a class="btn alt" href="https://vk.ru/phoneugra" target="_blank" rel="noopener">ВКонтакте</a><a class="btn" id="quickInfoRequest" href="#order" data-focus>Описать задачу</a></div>
 </dialog>
 <dialog class="modal quick-dialog" id="quickCatalogDialog" aria-labelledby="quickCatalogTitle">
 <header><h2 id="quickCatalogTitle" tabindex="-1">Примеры подбора</h2><button type="button" class="square" data-close-quick aria-label="Закрыть">×</button></header>
@@ -868,31 +871,63 @@ const existingAnswers = $$('#delivery details p');
 topics.slice(3).forEach((topic, index) => {
   topic.facts = [existingAnswers[index]?.textContent.trim()].filter(Boolean);
 });
+const displayQuery = /(?:^| )(?:экран[а-я]*|диспле[а-я]*|диспл|диспеи|lcd|матриц[а-я]*)(?= |$)/;
+const partQueries = [
+  displayQuery, /аккумулятор|батаре[яиюе]|(?:^| )акб(?= |$)/,
+  /шлейф|плат[ауые] зарядк|разъем/, /защитн|стекл|крышк|корпус|динамик|камер[ауые]/
+];
 const priceEntries = [
-  { name: 'Apple iPhone 16, 128 ГБ, чёрный, только eSIM', price: 65169 }
+  {
+    id: 's10-display', name: 'Дисплей для Samsung Galaxy S10 (SM-G973F)', price: 1884,
+    variant: 'In-Cell, чёрный, с рамкой',
+    details: 'Цена за деталь. Установка рассчитывается отдельно. У этого модуля не работают сканер отпечатка и автояркость.',
+    model: /(?:^| )(?:s10|g973f?|(?:samsung(?: galaxy)?|galaxy) 10)(?= |$)/,
+    part: displayQuery,
+    exclude: /(?:^| )(?:note|ноут|s10(?:e|plus|lite|5g)|(?:a|m) ?10|g97[057][a-z]*|(?:s?10) (?:e|е|plus|плюс|lite|5g|5 g)|oled|amoled|амолед|tft|тфт)(?= |$)|защитн|перекле|стекл|оригинал|отпечат|без рамк/,
+    service: 'parts', action: 1
+  },
+  {
+    id: 'iphone-16', name: 'Apple iPhone 16, 128 ГБ, чёрный, только eSIM', price: 65169,
+    variant: 'Смартфон, 128 ГБ, чёрный, только eSIM',
+    model: /(?:^| )iphone 16(?= |$)/,
+    exclude: /(?:^| )(?:pro|про|plus|плюс|e|е|mini|(?:256|512|1024)(?:gb|гб)?|1 ?(?:tb|тб)|nano|нано|sim)(?= |$)|сим карт|чехл|(?:^| )кейс|зарядк|кабел|розов|pink|teal|ультрамарин|белы|white|зелены|сини/,
+    service: 'devices', action: 1
+  }
 ];
 const priceDate = '26.11.2026';
-const rubles = new Intl.NumberFormat('ru-RU');
+const rubles = new Intl.NumberFormat('ru-RU', {style: 'currency', currency: 'RUB', maximumFractionDigits: 0});
+const priceFreshness = 'Цена проверена ' + priceDate + '. Уточните наличие.';
 topics.push({
-  key: 'prices', title: 'Прайс на технику',
-  summary: 'Справочные цены и уточнение наличия',
-  keywords: 'прайс цены стоимость сколько стоит айфон iphone 16 128 black черный esim смартфон',
-  facts: [
-    ...priceEntries.map(({name, price}) => `${name} — ${rubles.format(price)} ₽.`),
-    `Цена проверена ${priceDate}. Уточните наличие и условия перед обращением.`
-  ]
+  key: 'prices', title: 'Прайс на технику и запчасти',
+  summary: 'Проверенные цены и уточнение наличия',
+  keywords: 'прайс цена цены стоимость сколько стоит техника детали'
 });
 
 function openQuickInfo(key) {
+  const product = priceEntries.find(value => value.id === key);
   const topic = topics.find(value => value.key === key);
-  $('#quickInfoTitle').textContent = topic?.title || 'Быстрая информация';
-  $('#quickInfoIndex').hidden = Boolean(topic);
-  $('#quickInfoBack').hidden = !topic;
-  $('#quickInfoAnswer').replaceChildren(...(topic?.facts || []).map(text => {
+  const isPriceList = key === 'prices';
+  $('#quickInfoTitle').textContent = product?.name || topic?.title || 'Быстрая информация';
+  $('#quickInfoIndex').hidden = Boolean(topic || product);
+  const back = $('#quickInfoBack');
+  back.hidden = !topic && !product;
+  back.dataset.quickInfo = product ? 'prices' : '';
+  back.textContent = product ? 'Весь прайс' : 'Все вопросы';
+  const requestLink = $('#quickInfoRequest');
+  requestLink.href = product ? requestUrl(product.service, product.action, product.part ?
+    product.name + ' — ' + product.variant : product.name) : '#order';
+  requestLink.toggleAttribute('data-focus', !product);
+  requestLink.textContent = product ? 'Уточнить наличие' : 'Описать задачу';
+  const lines = product ? [rubles.format(product.price), product.variant, product.details, priceFreshness] :
+    isPriceList ? [priceFreshness] : (topic?.facts || []);
+  const paragraphs = lines.filter(Boolean).map((text, index) => {
     const paragraph = document.createElement('p');
     paragraph.textContent = text;
+    if (product && index === 0) paragraph.className = 'price-amount';
     return paragraph;
-  }));
+  });
+  const priceButtons = isPriceList ? priceEntries.map(product => resultControl(priceResult(product))) : [];
+  $('#quickInfoAnswer').replaceChildren(...priceButtons, ...paragraphs);
   quickDialog(quickInfoDialog);
 }
 
@@ -999,6 +1034,32 @@ function searchText(value) {
   return normalizedSearch(value).replace(/чат\s*гпт/g, 'chatgpt')
     .replace(/[^a-zа-я0-9]+/gi, ' ').trim();
 }
+function requestUrl(service, action, model) {
+  return '?' + new URLSearchParams({service, action, model: model.slice(0, 140)});
+}
+function priceResult(product) {
+  return {title: product.name, description: product.variant, price: product.price, info: product.id};
+}
+function priceMatches(query) {
+  const words = searchText(query.replace(/\+/g, ' plus '))
+    .replace(/галакси|гэлэкси/g, 'galaxy')
+    .replace(/\be sim\b/g, 'esim')
+    .replace(/(^| )[sс] *(?=\d)/g, '$1s')
+    .replace(/(^| )г(\d+)(ф?)(?= |$)/g, (_, space, number, suffix) => space + 'g' + number + (suffix ? 'f' : ''));
+  const partAction = partQueries.findIndex(pattern => pattern.test(words)) + 1;
+  const wantsPart = /(?:^| )(?:куп[а-я]*|кутить|кпить|заказ[а-я]*)(?= |$)/.test(words);
+  const wantsPrice = wantsPart || /(?:^| )(?:цен[а-я]*|стоим[а-я]*|сколько)(?= |$)/.test(words);
+  const repair = /(?:^| )(?:замен[а-я]*|разби[а-я]*|тресн[а-я]*|ремонт[а-я]*|поменя[а-я]*)(?= |$)/.test(words);
+  if (repair && !wantsPart) return [];
+  const entries = priceEntries.filter(product => product.model.test(words) && !product.exclude.test(words) &&
+    (product.part ? product.part.test(words) : !partAction)).map(priceResult);
+  if (entries.length) return entries;
+  if (partAction && wantsPrice) {
+    return [{title: 'Уточнить цену детали', description: 'Проверим модель, тип детали и наличие',
+      href: requestUrl('parts', partAction, query.trim())}];
+  }
+  return [];
+}
 const stopWords = new Set(['как', 'что', 'где', 'мне', 'для', 'или', 'на', 'по', 'не', 'из', 'уже', 'мой', 'это', 'ли']);
 function meaningfulWords(value) {
   return searchText(value).split(' ').filter(word => word.length > 1 && !stopWords.has(word));
@@ -1038,9 +1099,10 @@ function searchSite(query) {
     return ['Ремонт', 'Сборка ПК', 'Нейросети', 'Как связаться'].map(title => indexed.find(entry => entry.title === title));
   }
   const plain = searchText(query);
+  const priceResults = priceMatches(query);
   const intent = searchIntents.find(([pattern]) => pattern.test(plain))?.[1];
   const modelNumbers = terms.filter(word => /^\d/.test(word));
-  return indexed.map(entry => {
+  const ranked = indexed.map(entry => {
     if (entry.catalog && modelNumbers.length &&
         entry.titleWords.some(word => /^\d/.test(word)) &&
         !modelNumbers.some(word => entry.titleWords.includes(word))) return null;
@@ -1057,8 +1119,8 @@ function searchSite(query) {
     return {entry, score: score + hits * 2 + (intentHit ? 42 : 0), hits, intentHit};
   }).filter(result => result && (result.intentHit || result.hits >= Math.min(2, terms.length) ||
       (terms.length <= 3 && result.score >= 10)))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 6).map(result => result.entry);
+    .sort((a, b) => b.score - a.score).map(result => result.entry);
+  return [...priceResults, ...ranked].slice(0, 6);
 }
 
 function resultControl(entry) {
@@ -1076,7 +1138,17 @@ function resultControl(entry) {
   const description = document.createElement('span');
   title.textContent = entry.title;
   description.textContent = entry.description;
-  control.append(title, description);
+  if (entry.price) {
+    const heading = document.createElement('span');
+    heading.className = 'quick-price-heading';
+    const price = document.createElement('strong');
+    price.className = 'quick-price';
+    price.textContent = rubles.format(entry.price);
+    heading.append(title, price);
+    control.append(heading, description);
+  } else {
+    control.append(title, description);
+  }
   return control;
 }
 
@@ -1206,7 +1278,7 @@ if (pageKey && /^[1-4]$/.test(initialAction || '')) {
   const option = servicePages[pageKey].actions[Number(initialAction) - 1];
   chooseService(servicePages[pageKey].service);
   const model = new URLSearchParams(location.search).get('model')?.trim();
-  if (model && !context.value.trim()) context.value = model.slice(0, context.maxLength);
+  if (model) context.value = model.slice(0, context.maxLength);
   selectedAction = option[0];
   renderServiceAction();
   saveDraft();
@@ -1228,7 +1300,8 @@ $('#catalogCart').onclick = () => {
   quickCatalogDialog.close();
   $('#cartDialog').showModal();
 };
-if (new URLSearchParams(location.search).get('price') === '1') {
-  openQuickInfo('prices');
+const priceParam = new URLSearchParams(location.search).get('price');
+if (priceParam === '1' || priceEntries.some(product => product.id === priceParam)) {
+  openQuickInfo(priceParam === '1' ? 'prices' : priceParam);
 }
 </script></body></html>
