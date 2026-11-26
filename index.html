@@ -163,6 +163,7 @@ html{scroll-padding-top:120px}
     <a class="quick-service" data-page="chip" data-scene="chip" href="?service=ai" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#ai"/></svg><span>Нейросети</span></a>
     <a class="quick-service" data-page="study" href="?service=study" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#study"/></svg><span>Учебные проекты</span></a>
     <a class="quick-service" data-page="digital" href="?service=digital" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#digital"/></svg><span>Цифровые услуги</span></a>
+    <a class="quick-service" href="?price=1" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#shop"/></svg><span>Прайс</span></a>
   </nav>
 </div></section>
 <section class="service-page" id="servicePage" aria-labelledby="servicePageTitle" hidden>
@@ -867,6 +868,20 @@ const existingAnswers = $$('#delivery details p');
 topics.slice(3).forEach((topic, index) => {
   topic.facts = [existingAnswers[index]?.textContent.trim()].filter(Boolean);
 });
+const priceEntries = [
+  { name: 'Apple iPhone 16, 128 ГБ, чёрный, только eSIM', price: 65169 }
+];
+const priceDate = '26.11.2026';
+const rubles = new Intl.NumberFormat('ru-RU');
+topics.push({
+  key: 'prices', title: 'Прайс на технику',
+  summary: 'Справочные цены и уточнение наличия',
+  keywords: 'прайс цены стоимость сколько стоит айфон iphone 16 128 black черный esim смартфон',
+  facts: [
+    ...priceEntries.map(({name, price}) => `${name} — ${rubles.format(price)} ₽.`),
+    `Цена проверена ${priceDate}. Уточните наличие и условия перед обращением.`
+  ]
+});
 
 function openQuickInfo(key) {
   const topic = topics.find(value => value.key === key);
@@ -1213,4 +1228,7 @@ $('#catalogCart').onclick = () => {
   quickCatalogDialog.close();
   $('#cartDialog').showModal();
 };
+if (new URLSearchParams(location.search).get('price') === '1') {
+  openQuickInfo('prices');
+}
 </script></body></html>
