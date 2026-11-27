@@ -53,9 +53,53 @@ async function removePhoto(product,name){
  try{const result=guard(await bucket.remove([product+'/'+name]));if(!result?.length)throw Error('Удаление не подтверждено. Обновите список.');}catch(e){error=message(e);}finally{photoBusy=false;if(ready&&photoProduct===product&&epoch===photoEpoch){await loadPhotos();if(error)say('photoStatus',error);}photoControls();}
 }
 
+
+let importEpoch=0,importPlan=null,importWorker=null,importBusy=false;
+const importHeader=['sku','name','catalog','category','brand','compatibility','description','price_rub','stock_status'];
+const allowedHeaders=new Set(importHeader);
+function clearImport(){++importEpoch;importPlan=null;if(importWorker){importWorker.terminate();importWorker=null;}$('importApply').disabled=true;$('importTable').hidden=true;$('importTable').replaceChildren();say('importCounts','');say('importErrors','');}
+function resetImport(){clearImport();$('importFile').value='';$('importUpdate').checked=false;say('importStatus','');}
+function readImportFile(file,epoch){return new Promise(async(resolve,reject)=>{try{
+ const ext=file.name.toLowerCase().split('.').pop();if(!['csv','xlsx'].includes(ext)||file.size>5*1024*1024||!file.size)throw Error('Нужен непустой CSV/XLSX до 5 МБ');
+ const buffer=await file.arrayBuffer();if(epoch!==importEpoch)throw Error('Проверка отменена');
+ const w=new Worker('import-worker.js?v=1');importWorker=w;const timer=setTimeout(()=>{w.terminate();if(importWorker===w)importWorker=null;reject(Error('Превышено время разбора файла'));},20000);
+ const finish=()=>{clearTimeout(timer);w.terminate();if(importWorker===w)importWorker=null;};
+ w.onmessage=e=>{finish();e.data.error?reject(Error(e.data.error)):resolve(e.data.rows);};w.onerror=()=>{finish();reject(Error('Не удалось прочитать файл. Для XLSX требуется доступ к библиотеке SheetJS; попробуйте CSV UTF-8.'));};
+ w.postMessage({buffer,ext},[buffer]);
+ }catch(e){reject(e);}});}
+function normalizeImport(rows){
+ const header=rows[0].map(v=>String(v).trim().toLowerCase());if(header.some(v=>!allowedHeaders.has(v))||new Set(header).size!==header.length)throw Error('Неизвестные или повторяющиеся заголовки. Используйте CSV-шаблон.');
+ for(const required of ['sku','name','catalog','category','price_rub'])if(!header.includes(required))throw Error('Нет обязательного столбца '+required);
+ const data=[],errors=[],seen=new Set();
+ for(let i=1;i<rows.length;i++){try{const cells=rows[i];if(cells.length>header.length&&cells.slice(header.length).some(x=>x!==''))throw Error('Лишние столбцы');const x=Object.fromEntries(header.map((k,c)=>[k,cells[c]??'']));if(typeof x.sku!=='string')throw Error('Артикул Excel должен быть текстом (сохранение ведущих нулей)');
+ const row={};for(const [k,max] of Object.entries({sku:80,name:160,category:80,brand:80,compatibility:300,description:1500})){if(x[k]!==undefined&&typeof x[k]!=='string')throw Error(k+': ожидается текст');row[k]=(x[k]??'').trim();if(row[k].length>max)throw Error(k+': слишком длинное значение');}
+ if(!row.sku||!row.name||!row.category)throw Error('Пустой артикул, название или категория');
+ const sku=row.sku.toLowerCase();if(seen.has(sku))throw Error('Повтор артикула '+row.sku);seen.add(sku);
+ const c=String(x.catalog).trim().toLowerCase();row.catalog=({electronics:'electronics',parts:'parts','электроника':'electronics','запчасти':'parts'})[c];if(!row.catalog)throw Error('Каталог: electronics или parts');
+ const stock=String(x.stock_status||'unknown').trim().toLowerCase();row.stock_status=({unknown:'unknown',in_stock:'in_stock',on_order:'on_order',out_of_stock:'out_of_stock','уточняется':'unknown','в наличии':'in_stock','под заказ':'on_order','нет в наличии':'out_of_stock'})[stock];if(!row.stock_status)throw Error('Неизвестный статус наличия');
+ const value=String(x.price_rub??'').trim();row.price_rub=value===''?null:Number(value);if(value!==''&&(!/^\d+$/.test(value)||!Number.isSafeInteger(row.price_rub)||row.price_rub>100000000))throw Error('Цена: целое число от 0 до 100000000 или пусто');
+ data.push({row:i+1,data:row});
+ }catch(e){errors.push('Строка '+(i+1)+': '+e.message);}}
+ return {data,errors};
+}
+function drawImport(entries){const table=node('table'),thead=node('thead'),head=node('tr');for(const s of ['Строка','Артикул','Название','Действие','Цена, ₽'])head.append(node('th',s));thead.append(head);table.append(thead);const tbody=node('tbody');for(const x of entries){const tr=node('tr');for(const v of [x.row,x.data.sku,x.data.name,x.label,x.priceLabel])tr.append(node('td',String(v)));tbody.append(tr);}table.append(tbody);$('importTable').replaceChildren(table);$('importTable').hidden=false;}
+$('importFile').addEventListener('change',()=>{clearImport();say('importStatus','Нажмите «Проверить и показать».');});
+$('importUpdate').addEventListener('change',()=>{clearImport();say('importStatus','Настройки изменены. Повторите проверку.');});
+$('importClear').addEventListener('click',resetImport);
+$('importPreview').addEventListener('click',async()=>{if(!ready||importBusy)return;const file=$('importFile').files[0];clearImport();const epoch=importEpoch;if(!file){say('importStatus','Выберите файл');return;}say('importStatus','Проверка файла…');
+ try{const rows=await readImportFile(file,epoch);if(!ready||epoch!==importEpoch)return;const {data,errors}=normalizeImport(rows);if(errors.length){say('importErrors',errors.join('\n'));say('importStatus','Ошибок: '+errors.length+'. Импорт заблокирован; исправьте файл.');return;}
+ const matches=guard(await client.rpc('catalog_import_lookup',{p_skus:data.map(x=>x.data.sku.toLowerCase())}));if(!ready||epoch!==importEpoch)return;const bySku=new Map(matches.map(x=>[x.sku.trim().toLowerCase(),x]));const update=$('importUpdate').checked,plan=[],entries=[];let added=0,updated=0,skipped=0;
+ for(const x of data){const old=bySku.get(x.data.sku.toLowerCase());let label,priceLabel=x.data.price_rub??'По запросу';if(!old){label='Новый черновик';added++;plan.push({action:'insert',data:x.data});}else if(update&&x.data.price_rub!==null&&old.price_rub!==x.data.price_rub){label='Цена'+(old.published?' (публичная)':'');priceLabel=(old.price_rub??'По запросу')+' → '+x.data.price_rub;updated++;plan.push({action:'price',id:old.id,updated_at:old.updated_at,data:{sku:x.data.sku,price_rub:x.data.price_rub}});}else{label='Пропуск';skipped++;}entries.push({...x,label,priceLabel});}
+ drawImport(entries);say('importCounts','Новые: '+added+' · Цены: '+updated+' · Пропуск: '+skipped);say('importStatus',plan.length?'Проверьте список. До подтверждения изменений нет.':'Нет изменений для импорта.');importPlan=plan;$('importApply').disabled=!plan.length;
+ }catch(e){if(epoch===importEpoch)say('importStatus',message(e));}});
+$('importApply').addEventListener('click',async()=>{if(!ready||importBusy||!importPlan?.length)return;if(!confirm('Записать '+importPlan.length+' изменений одной транзакцией?'))return;const plan=importPlan,epoch=importEpoch;importBusy=true;$('importApply').disabled=true;$('importPreview').disabled=true;$('importClear').disabled=true;$('importFile').disabled=true;$('importUpdate').disabled=true;say('importStatus','Сохранение…');
+ try{const result=guard(await client.rpc('catalog_apply_import',{p_rows:plan}));if(epoch===importEpoch&&ready){resetImport();say('importStatus','Импорт завершён. Добавлено: '+result.inserted+', обновлено цен: '+result.updated+'.');page=0;await load();}}
+ catch(e){if(epoch===importEpoch){clearImport();say('importStatus','Импорт не подтверждён: '+message(e)+'. Повторите предпросмотр, прежде чем повторять запись.');}}
+ finally{importBusy=false;$('importPreview').disabled=false;$('importClear').disabled=false;$('importFile').disabled=false;$('importUpdate').disabled=false;}});
+
 function clearMfa(){factorId=null;$('mfa').hidden=true;$('secretBox').hidden=true;say('secret','');verify.reset();verify.hidden=true;$('enroll').hidden=true;}
 function reset(){hidePhotos();editing=null;form.reset();say('formTitle','Новый товар');say('formStatus','');}
-function locked(){ready=false;++loadEpoch;$('editor').hidden=true;$('products').replaceChildren();reset();$('authPanel').hidden=false;}
+function locked(){resetImport();ready=false;++loadEpoch;$('editor').hidden=true;$('products').replaceChildren();reset();$('authPanel').hidden=false;}
 async function assess(){
  const epoch=++authEpoch;locked();clearMfa();const session=guard(await client.auth.getSession()).session;if(epoch!==authEpoch)return;
  login.hidden=!!session;$('logoutAuth').hidden=!session;if(!session){say('authStatus','');return;}
