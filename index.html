@@ -151,6 +151,14 @@ html{scroll-padding-top:120px}
 @media(max-width:760px) {
   body #quickInfoDialog.contact-sheet[open] { inset:auto 0 0; margin:0 auto; width:100%; max-width:100%; height:auto; max-height:90dvh; border-radius:20px 20px 0 0; padding:14px max(16px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left)); overflow-y:auto; }
 }
+</style><style>
+body #accountDialog #accountStatus:empty { display:none; }
+body #accountDialog .account-modes { margin:12px 0; }
+body #accountDialog .account-form button.btn { min-height:46px; }
+@media(max-width:760px) {
+  body dialog#accountDialog.quick-dialog[open] { inset:auto 0 0; margin:0 auto; width:100%; max-width:100%; height:auto; max-height:90dvh; border-radius:20px 20px 0 0; padding:14px 16px max(20px,env(safe-area-inset-bottom)); overflow-y:auto; }
+  body #accountDialog > header { position:static; min-height:44px; padding:0 0 8px; }
+}
 </style></head><body><svg xmlns="http://www.w3.org/2000/svg" style="display:none"><defs>
 <symbol id="toolsIcon" viewBox="0 0 24 24"><path d="M14 7a5 5 0 0 0-6-5l2.5 2.5-1 3-3 1L4 6a5 5 0 0 0 6 6l8 8a2 2 0 0 0 3-3l-8-8a5 5 0 0 0 1-2Z"/></symbol>
 <symbol id="profileIcon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2"/></symbol>
@@ -317,8 +325,8 @@ html{scroll-padding-top:120px}
       <button id="accountEmailButton" type="submit" class="btn">Получить код</button>
     </form>
     <form class="account-form" id="accountCodeForm" method="post" hidden>
-      <label for="accountCode">Шестизначный код</label>
-      <input id="accountCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required>
+      <label for="accountCode">Код из письма</label>
+      <input id="accountCode" inputmode="numeric" autocomplete="one-time-code" maxlength="10" pattern="[0-9]{6,10}" required>
       <button id="accountCodeButton" type="submit" class="btn">Подтвердить код</button>
       <button id="accountChangeEmail" class="text-button" type="button">Изменить почту или запросить новый код</button>
     </form>
@@ -1541,7 +1549,7 @@ $('#catalogCart').onclick = () => {
   quickDialog($('#cartDialog'));
 };
 
-const accountSettings = {url: '', publishableKey: ''};
+const accountSettings = {url: 'https://qlggbdzodqagtxqifslg.supabase.co', publishableKey: 'sb_publishable_xmpxNkuvDizZoYOl12CJCw_lM-h9kSW'};
 
 function makeAccountClient(settings, request = fetch) {
   if (!/^https:\/\/[a-z0-9]{20}\.supabase\.co\/?$/.test(settings.url) ||
@@ -1593,7 +1601,7 @@ if (accountPreview) {
   accountEmail.readOnly = true;
 } else if (!accountClient) {
   $('#accountLabel').textContent = 'Кабинет';
-  accountStatus.textContent = 'Кабинет подключается. Цены и обращение к мастеру доступны без входа.';
+  accountStatus.textContent = 'Вход временно недоступен. Обратитесь к мастеру через раздел «Контакты».';
 }
 function resetAccountCode() {
   pendingEmail = '';
@@ -1671,7 +1679,7 @@ accountEmailForm.addEventListener('submit', async event => {
       if (!signal.aborted) requestCodeStep(email);
     }, error => {
       accountStatus.textContent = error.status === 429
-        ? 'Код уже запрашивали. Подождите минуту и попробуйте снова.'
+        ? 'Достигнут лимит отправки писем. Проверьте входящие или попробуйте позже.'
         : 'Не удалось запросить код. Проверьте почту и попробуйте ещё раз.';
     });
   }
