@@ -331,7 +331,7 @@ body #accountDialog .account-form button.btn { min-height:46px; }
       <button type="button" class="btn" data-account-provider="custom:telegram" hidden>Продолжить через Telegram</button>
       <button type="button" class="btn alt" data-account-provider="google" hidden>Продолжить через Google</button>
       <button type="button" class="btn alt" id="accountPasskey" aria-describedby="accountPasskeyHint" hidden>Войти ключом или по QR</button>
-      <p class="muted auth-hint" id="accountPasskeyHint" hidden>Если ключ уже добавлен, выберите вход с другого телефона, чтобы браузер показал QR-код.</p>
+      <p class="muted auth-hint" id="accountPasskeyHint" hidden>Для входа по QR сначала сохраните ключ на телефоне. На компьютере выберите «Телефон или планшет», если браузер предложит этот вариант.</p>
     </div>
     <details class="account-email-option" id="accountEmailOption" open>
       <summary>Вход по коду на почту</summary>
@@ -357,7 +357,7 @@ body #accountDialog .account-form button.btn { min-height:46px; }
     <p class="account-email" id="accountMemberEmail"></p>
     <div class="account-key-actions" id="accountKeyActions" hidden>
       <button type="button" class="btn alt" id="accountAddPasskey" aria-describedby="accountAddPasskeyHint">Добавить ключ входа</button>
-      <p class="muted auth-hint" id="accountAddPasskeyHint">Используйте ключ для повторного входа с этого устройства или по QR с телефона.</p>
+      <p class="muted auth-hint" id="accountAddPasskeyHint">Для входа по QR откройте кабинет на телефоне и добавьте ключ там. Если Windows просит вставить USB-ключ, можно нажать «Отмена» и продолжить на телефоне.</p>
     </div>
     <div class="quick-info-footer">
       <button type="button" class="btn" data-window-search>Найти запчасть или услугу</button>
@@ -1732,26 +1732,26 @@ for (const button of accountProviderButtons) {
 
 accountPasskey.addEventListener('click', async () => {
   if (accountPasskey.hidden || !accountClient || accountOperation) return;
-  accountStatus.textContent = 'Выберите сохранённый ключ или другое устройство.';
+  accountStatus.textContent = 'Выберите сохранённый ключ. Если ключ на телефоне, выберите «Телефон или планшет».';
   await runAccountAction(async () => {
     const {data, error} = await accountClient.signInWithPasskey();
     if (error || !data.session) throw new Error('No passkey session returned');
     syncLiveAccount(data.session);
     if (accountDialog.open) $('#accountTitle').focus();
   }, () => {
-    accountStatus.textContent = 'Вход по ключу не завершён. Если у вас ещё нет ключа, добавьте его после входа другим способом.';
+    accountStatus.textContent = 'Вход по ключу не завершён. Можно войти через Google или Telegram и добавить ключ в кабинете на телефоне.';
   });
 });
 
 accountAddPasskey.addEventListener('click', async () => {
   if (!liveAccount || accountOperation) return;
-  accountStatus.textContent = 'Подтвердите создание ключа на своём устройстве.';
+  accountStatus.textContent = 'Подтвердите создание ключа на своём устройстве. Если появится запрос USB-ключа, можно отменить и добавить ключ на телефоне.';
   await runAccountAction(async () => {
     const {error} = await accountClient.registerPasskey();
     if (error) throw error;
     accountStatus.textContent = 'Ключ добавлен. Его можно использовать при следующем входе.';
   }, () => {
-    accountStatus.textContent = 'Не удалось добавить ключ. Проверьте настройки устройства или войдите заново.';
+    accountStatus.textContent = 'Ключ не добавлен. Для входа по QR откройте этот кабинет на телефоне и подтвердите создание ключа PIN-кодом или биометрией.';
   });
 });
 
