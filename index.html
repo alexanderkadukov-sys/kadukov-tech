@@ -282,6 +282,18 @@ body #accountDialog .account-form button.btn { min-height:46px; }
     <button class="btn alt" type="button" id="copyRequest">Скопировать запрос</button>
   </div>
   <p class="note full">В Telegram откроется черновик. Проверьте его и нажмите «Отправить». Текст можно скопировать и отправить в другом мессенджере. Не указывайте пароли и коды подтверждения.</p>
+  <div class="field full" id="trackedRequest" hidden>
+    <button class="btn alt" type="button" id="createTrackedRequest">Создать заявку с номером</button>
+    <span class="field-hint">Заявка сохранится на сайте. Подтвердите её в Telegram, чтобы мастер получил описание, а вы могли узнать статус и получить уведомление о готовности.</span>
+  </div>
+  <section class="field full" id="trackedRequestResult" aria-label="Статус заявки" hidden>
+    <p id="trackedRequestStatus" role="status"></p>
+    <div class="request-buttons">
+      <a class="btn" id="trackedTelegram" target="_blank" rel="noopener noreferrer" hidden>Подтвердить заявку в Telegram</a>
+      <button class="btn alt" type="button" id="refreshTrackedRequest" hidden>Обновить статус</button>
+      <button class="btn alt" type="button" id="copyTrackedRequest" hidden>Скопировать личную ссылку</button>
+    </div>
+  </section>
   <p class="request-status full" id="requestStatus" role="status"></p>
   <label class="field full" id="copyFallback" hidden>Текст запроса<textarea id="copyText" readonly></textarea></label>
 </form></div></section>
@@ -1890,4 +1902,4 @@ if (priceParam === '1' || priceEntries.some(product => product.id === priceParam
     strip.scrollTo({left:next, behavior:next && !reduced.matches ? 'smooth' : 'instant'});
   }, 1000);
 })();
-</script></body></html>
+</script><script src="repair-request.js?v=1" defer></script></body></html>
