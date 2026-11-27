@@ -1,0 +1,9 @@
+:root { color-scheme: light; font-family: system-ui, sans-serif; color: #152d3a; background: #eff5f5; }
+body { margin: 0; }
+main { box-sizing: border-box; width: min(100% - 32px, 720px); margin: clamp(16px, 6vw, 64px) auto; padding: clamp(20px, 5vw, 42px); background: #fff; border: 1px solid #d5e2e5; border-radius: 16px; line-height: 1.6; }
+h1, h2 { line-height: 1.2; }
+h1 { font-size: clamp(1.75rem, 6vw, 2.5rem); }
+h2 { font-size: 1.2rem; margin: 1.65em 0 .4em; }
+a { color: #125a59; text-underline-offset: .18em; overflow-wrap: anywhere; }
+ul { padding-left: 1.3em; }
+li + li { margin-top: .55em; }
