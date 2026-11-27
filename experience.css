@@ -586,3 +586,20 @@ body .quick-dialog .field-hint { overflow-wrap: anywhere; }
   body .quick-dialog .request-buttons { grid-template-columns: minmax(0,1fr); }
   body .quick-dialog .request-buttons .btn { min-height: 46px; }
 }
+
+/* Storefront */
+.quick-home { background: radial-gradient(ellipse at top right, var(--soft), transparent 62%), var(--bg); }
+.main-intro { box-shadow: 0 14px 35px rgb(8 30 36 / 16%); }
+.directions-heading { margin-block: clamp(24px, 4vw, 44px) 14px; }
+.directions-heading h2 { margin-right: auto; }
+.directions-heading a { display:inline-flex; align-items:center; min-height:44px; padding:6px 14px; border:1px solid var(--line); border-radius:999px; background:var(--surface); }
+.directions-heading a[href="catalog/"] { background:var(--night); color:#fff; border-color:var(--night); }
+.primary-services .quick-service { position:relative; border-radius:18px; box-shadow:0 3px 12px rgb(10 31 40 / 6%); }
+.primary-services .service-emblem { border-radius:12px; }
+@media (hover:hover) {
+  .primary-services .quick-service:hover { border-color:var(--blue); box-shadow:0 7px 20px rgb(10 31 40 / 12%); }
+}
+@media (max-width:620px) {
+  .directions-heading h2 { flex-basis:100%; }
+  .directions-heading a { font-size:.84rem; }
+}
