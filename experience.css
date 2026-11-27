@@ -603,3 +603,37 @@ body .quick-dialog .field-hint { overflow-wrap: anywhere; }
   .directions-heading h2 { flex-basis:100%; }
   .directions-heading a { font-size:.84rem; }
 }
+
+/* Main storefront and workshop entrances */
+body { --night:#101630; --night-raised:#202b49; --signal:#a0f0e0; --blue:#184b68; --soft:#e2edf3; }
+body.dark { --bg:#10182a; --surface:#19263b; --soft:#22354a; --blue:#a0e9df; --line:#35455c; }
+#quickHome { background:var(--bg); }
+.hub-grid { display:grid; grid-template-columns:1.1fr 1fr; gap:14px; }
+.hub-shop,.hub-workshop { position:relative; isolation:isolate; overflow:hidden; border-radius:24px; color:#fff; }
+.hub-shop { display:flex; flex-direction:column; align-items:flex-start; padding:clamp(24px,4vw,60px); background:radial-gradient(ellipse at 105% 8%,#235567,transparent 60%),linear-gradient(130deg,#111833,#202449); }
+.hub-shop::after { content:""; position:absolute; z-index:-1; width:70%; aspect-ratio:1; border:1px solid #a9f1ec30; border-radius:26%; transform:rotate(34deg); right:-37%; bottom:-15%; box-shadow:0 0 0 20px #93cddd0c,0 0 0 42px #93cddd09; }
+.hub-brand { font-weight:750; letter-spacing:.13em; font-size:.82rem; }
+.hub-brand span { color:#94e9dc; }
+#quickHome .hub-shop h1 { margin:24px 0 16px; color:white; font-size:clamp(42px,6.3vw,88px); font-weight:700; line-height:.96; letter-spacing:-.065em; }
+.hub-links { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px; }
+.hub-links a { display:inline-flex; align-items:center; min-height:44px; padding:3px 13px; border:1px solid #708393; border-radius:24px; color:#e7f2ff; font-size:.9rem; }
+.hub-action { display:inline-flex; align-items:center; justify-content:space-between; gap:24px; min-height:46px; padding:9px 17px; color:#102c32; background:#a8eee2; border-radius:12px; font-weight:720; }
+.hub-shop .hub-action { margin-top:auto; }
+.hub-workshop { display:flex; align-items:end; background:#17263c; }
+.hub-workshop img { position:absolute; inset:0; z-index:-2; width:100%; height:100%; object-fit:cover; }
+.hub-workshop::before { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(0deg,#091527 4%,#0c1930df 35%,#0d182622 82%); }
+.hub-workshop-copy { padding:clamp(24px,3vw,44px); }
+.hub-workshop h2,.hub-more { margin:0; letter-spacing:-.045em; }
+.hub-workshop h2 { color:#fff; font-size:clamp(30px,3.8vw,54px); line-height:1.08; }
+#quickHome .hub-workshop p { color:#e3eaf4; margin:7px 0 18px; }
+.hub-workshop .hub-action { background:#fff; color:#14213b; }
+.hub-more { grid-column:1/-1; font-size:1.35rem; margin-top:16px; }
+.hub-quote .hero-price { position:static; width:fit-content; margin-top:18px; }
+@media(max-width:700px) {
+  .hub-grid { grid-template-columns:minmax(0,1fr); gap:10px; }
+  .hub-shop,.hub-workshop { border-radius:18px; }
+  #quickHome .hub-shop h1 { margin:12px 0; }
+  .hub-links { margin-bottom:14px; }
+  .hub-workshop { min-height:192px; }
+  .hub-workshop img { object-position:center 58%; }
+}
