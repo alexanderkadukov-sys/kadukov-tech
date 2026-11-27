@@ -182,7 +182,7 @@ html{scroll-padding-top:120px}
   </div>
   <div class="directions-heading">
     <h2>Что вам нужно?</h2>
-    <a href="?price=1" data-quick-info="prices">Проверенные цены</a>
+    <a href="catalog/">Каталог товаров ↗</a><a href="?price=1" data-quick-info="prices">Проверенные цены</a>
   </div>
   <nav class="quick-directions" aria-label="Направления">
     <div class="primary-services">
@@ -213,7 +213,7 @@ html{scroll-padding-top:120px}
     <div class="wrap service-page-wrap">
       <div class="service-page-links">
         <a class="service-home" href="./">Все направления</a>
-        <a class="service-page-examples" id="servicePageExamples" hidden>Примеры подбора</a>
+        <a class="service-page-examples" id="servicePageExamples" hidden>Каталог товаров ↗</a>
       </div>
       <div class="service-page-lead">
         <div><h1 id="servicePageTitle"></h1><p id="servicePageIntro"></p></div>
@@ -275,7 +275,7 @@ html{scroll-padding-top:120px}
 </dialog>
 <dialog class="modal quick-dialog" id="quickCatalogDialog" aria-labelledby="quickCatalogTitle">
 <header><h2 id="quickCatalogTitle" tabindex="-1">Примеры подбора</h2><button type="button" class="square" data-close-quick aria-label="Закрыть">×</button></header>
-<div id="quickCatalogContent"></div>
+<div class="quick-info-footer"><a class="btn alt" href="catalog/">Открыть актуальный каталог ↗</a></div><div id="quickCatalogContent"></div>
 <p class="request-status" id="quickCatalogStatus" role="status"></p>
 <div class="quick-info-footer"><button type="button" class="btn alt" id="catalogCart">Мой запрос</button></div>
 </dialog>
@@ -703,7 +703,7 @@ const servicePages = {
     title: 'Подбор техники',
     icon: 'shop',
     intro: 'Помогу сравнить смартфоны, ноутбуки и другие устройства по вашим задачам и бюджету.',
-    examples: './#electronics',
+    examples: './catalog/?type=electronics',
     actions: [
       ['Подобрать смартфон', 'Сравним камеру, батарею, экран и объём памяти.'],
       ['Подобрать ноутбук', 'Учтём программы, вес, автономность и размер экрана.'],
@@ -716,7 +716,7 @@ const servicePages = {
     title: 'Подбор запчастей',
     icon: 'parts',
     intro: 'Помогу подобрать дисплей, аккумулятор, шлейф или другую деталь по модели устройства.',
-    examples: './#parts-catalog',
+    examples: './catalog/?type=parts',
     actions: [
       ['Дисплей или сенсор', 'Подбор по точной модели устройства и типу матрицы.'],
       ['Аккумулятор', 'Проверка совместимости по модели и маркировке.'],
@@ -806,7 +806,7 @@ function openServicePage() {
   if (page.examples) {
     const examples = $('#servicePageExamples');
     examples.href = page.examples;
-    examples.dataset.quickCatalog = pageKey === 'parts' ? 'parts' : 'electronics';
+    delete examples.dataset.quickCatalog;
     examples.hidden = false;
   }
 }
