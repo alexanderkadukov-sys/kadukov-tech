@@ -318,3 +318,60 @@ body .quick-info-footer .btn:hover { transform: none; }
   body .request-buttons { grid-template-columns: 1fr; }
   body .mobilebar .btn { font-size: 11px; }
 }
+
+/* Scroll depth — lightweight, layered parallax with static fallback. */
+body {
+  --depth-far: rgba(39, 123, 119, .13);
+  --depth-near: rgba(114, 169, 186, .14);
+}
+body.dark {
+  --depth-far: rgba(66, 143, 130, .20);
+  --depth-near: rgba(43, 107, 140, .19);
+}
+main#top { isolation: isolate; position: relative; }
+main#top::before, main#top::after {
+  content: "";
+  position: fixed;
+  inset: -15vh 0;
+  pointer-events: none;
+  z-index: -1;
+}
+main#top::before {
+  background: radial-gradient(ellipse at 85% 20%, var(--depth-far), transparent 53%),
+              radial-gradient(ellipse at 8% 70%, var(--depth-near), transparent 52%);
+}
+main#top::after {
+  background: radial-gradient(ellipse at 15% 25%, var(--depth-near), transparent 42%),
+              radial-gradient(ellipse at 92% 83%, var(--depth-far), transparent 48%);
+  opacity: .65;
+}
+.quick-home { background: transparent; }
+.service-page-hero { background: linear-gradient(115deg, var(--soft), transparent); }
+main#top .panel, main#top .statstrip {
+  box-shadow: 0 8px 28px rgba(16, 39, 45, .055);
+}
+body.dark main#top .panel, body.dark main#top .statstrip {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .14);
+}
+@keyframes depthFar { from { transform: translateY(-7vh); } to { transform: translateY(7vh); } }
+@keyframes depthNear { from { transform: translateY(10vh); } to { transform: translateY(-10vh); } }
+@keyframes depthPhoto { from { transform: translateY(0) scale(1.035); } to { transform: translateY(12%) scale(1.18); } }
+@supports (animation-timeline: scroll(root block)) {
+  @media (prefers-reduced-motion: no-preference) {
+    main#top::before {
+      animation: depthFar 1s linear both;
+      animation-timeline: scroll(root block);
+    }
+    main#top::after {
+      animation: depthNear 1s linear both;
+      animation-timeline: scroll(root block);
+    }
+    .main-intro { view-timeline-name: --intro-depth; view-timeline-axis: block; }
+    .main-photo {
+      animation: depthPhoto 1s linear both;
+      animation-timeline: --intro-depth;
+      animation-range: exit 0% exit 100%;
+      transform-origin: 50% 40%;
+    }
+  }
+}
