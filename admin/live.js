@@ -3,7 +3,17 @@
 const $=id=>document.getElementById(id), form=$('form'), login=$('login'), verify=$('verify');
 const say=(id,v)=>{$(id).textContent=v;};
 if(!window.supabase?.createClient){say('connection','Библиотека подключения не загрузилась. Обновите страницу.');login.hidden=true;return;}
-const client=window.supabase.createClient('https://qlggbdzodqagtxqifslg.supabase.co',"sb_publishable_xmpxNkuvDizZoYOl12CJCw_lM-h9kSW",{auth:{persistSession:false,autoRefreshToken:true,detectSessionInUrl:false}});
+const sessionKey='kadukov-admin-v407',rememberKey=sessionKey+'-until',flowKey=sessionKey+'-flow',MAX_TAB=8*60*60*1000;
+const memory=new Map();
+function readTab(k){try{return sessionStorage.getItem(k);}catch{return null;}}
+function writeTab(k,v){try{sessionStorage.setItem(k,v);}catch{}}
+function removeTab(k){try{sessionStorage.removeItem(k);}catch{}}
+function remembered(){const t=Number(readTab(rememberKey));return Number.isFinite(t)&&t>Date.now();}
+if(!remembered()){removeTab(rememberKey);removeTab(sessionKey);}
+function rememberChoice(){if($('rememberTab').checked)writeTab(rememberKey,String(Date.now()+MAX_TAB));else{removeTab(rememberKey);removeTab(sessionKey);}}
+const authStorage={getItem(k){if(k.endsWith('-code-verifier'))return readTab(k)||memory.get(k)||null;return memory.get(k)||(remembered()?readTab(k):null);},setItem(k,v){memory.set(k,v);if(k.endsWith('-code-verifier')||remembered())writeTab(k,v);},removeItem(k){memory.delete(k);removeTab(k);}};
+const redirectTo='https://alexanderkadukov-sys.github.io/kadukov-tech/admin/live.html';
+const client=window.supabase.createClient('https://qlggbdzodqagtxqifslg.supabase.co',"sb_publishable_xmpxNkuvDizZoYOl12CJCw_lM-h9kSW",{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:'pkce',storageKey:sessionKey,storage:authStorage,experimental:{passkey:true}}});
 const PAGE=30, fields=['sku','name','catalog','category','brand','compatibility','description','price_rub','stock_status','published'];
 let editing=null,page=0,factorId=null,ready=false,loadEpoch=0,authEpoch=0;
 const labels={parts:'Запчасти',electronics:'Электроника'},stocks={unknown:'Уточняется',in_stock:'В наличии',on_order:'Под заказ',out_of_stock:'Нет в наличии'};
@@ -97,12 +107,25 @@ $('importApply').addEventListener('click',async()=>{if(!ready||importBusy||!impo
  catch(e){if(epoch===importEpoch){clearImport();say('importStatus','Импорт не подтверждён: '+message(e)+'. Повторите предпросмотр, прежде чем повторять запись.');}}
  finally{importBusy=false;$('importPreview').disabled=false;$('importClear').disabled=false;$('importFile').disabled=false;$('importUpdate').disabled=false;}});
 
+let loginMode='password',emailForCode='';
+function loginScreen(session){$('loginOptions').hidden=!!session;login.hidden=!!session||loginMode!=='password';$('emailLogin').hidden=!!session||loginMode!=='email';$('logoutAuth').hidden=!session;}
+function switchLogin(mode){loginMode=mode;$('passwordTab').setAttribute('aria-pressed',String(mode==='password'));$('emailTab').setAttribute('aria-pressed',String(mode==='email'));loginScreen(null);say('authStatus','');}
+$('passwordTab').addEventListener('click',()=>switchLogin('password'));$('emailTab').addEventListener('click',()=>switchLogin('email'));
+$('rememberTab').checked=remembered();
+const webauthnAvailable=!!window.PublicKeyCredential&&!!navigator.credentials&&window.isSecureContext;
+if(!webauthnAvailable||typeof client.auth.signInWithPasskey!=='function'){$('passkeyLogin').disabled=true;$('registerPasskey').disabled=true;}
+$('passkeyLogin').addEventListener('click',e=>busy(e,async()=>{rememberChoice();guard(await client.auth.signInWithPasskey());await assess();},'authStatus'));
+$('googleLogin').addEventListener('click',e=>busy(e,async()=>{rememberChoice();writeTab(flowKey,'google');try{guard(await client.auth.signInWithOAuth({provider:'google',options:{redirectTo}}));}catch(err){removeTab(flowKey);throw err;}},'authStatus'));
+$('emailSend').addEventListener('submit',e=>{e.preventDefault();busy(e,async()=>{rememberChoice();const email=String(new FormData(e.currentTarget).get('email')).trim();guard(await client.auth.signInWithOtp({email,options:{shouldCreateUser:false,emailRedirectTo:redirectTo}}));emailForCode=email;$('emailVerify').hidden=false;say('authStatus','Проверьте почту. Введите код из письма. Если получена ссылка вместо кода, нужен почтовый шаблон OTP.');},'authStatus');});
+$('emailVerify').addEventListener('submit',e=>{e.preventDefault();busy(e,async()=>{if(!emailForCode)throw Error('Сначала запросите код');const token=String(new FormData(e.currentTarget).get('code')).trim();guard(await client.auth.verifyOtp({email:emailForCode,token,type:'email'}));$('emailVerify').reset();await assess();},'authStatus');});
+$('registerPasskey').addEventListener('click',e=>busy(e,async()=>{if(!ready)throw Error('Сначала подтвердите MFA');guard(await client.auth.registerPasskey());say('securityStatus','Ключ зарегистрирован. Сохраните резервный способ входа.');},'securityStatus'));
+$('listPasskeys').addEventListener('click',e=>busy(e,async()=>{if(!ready||!client.auth.passkey?.list)throw Error('Passkey недоступен');const list=guard(await client.auth.passkey.list());const host=$('passkeyList');host.replaceChildren();for(const x of list){const row=node('div',undefined,'actions');row.append(node('span',x.friendly_name||'Системный ключ'));const del=button('Удалить',async()=>{if(!ready||!confirm('Удалить этот ключ? Пароль и MFA сохраняются.'))return;del.disabled=true;try{guard(await client.auth.passkey.delete({passkeyId:x.id}));row.remove();say('securityStatus','Ключ удалён.');}catch(err){say('securityStatus',message(err));del.disabled=false;}});row.append(del);host.append(row);}say('securityStatus','Ключей: '+list.length);},'securityStatus'));
 function clearMfa(){factorId=null;$('mfa').hidden=true;$('secretBox').hidden=true;say('secret','');verify.reset();verify.hidden=true;$('enroll').hidden=true;}
 function reset(){hidePhotos();editing=null;form.reset();say('formTitle','Новый товар');say('formStatus','');}
-function locked(){resetImport();ready=false;++loadEpoch;$('editor').hidden=true;$('products').replaceChildren();reset();$('authPanel').hidden=false;}
+function locked(){resetImport();$('passkeyList').replaceChildren();say('securityStatus','');ready=false;++loadEpoch;$('editor').hidden=true;$('products').replaceChildren();reset();$('authPanel').hidden=false;}
 async function assess(){
  const epoch=++authEpoch;locked();clearMfa();const session=guard(await client.auth.getSession()).session;if(epoch!==authEpoch)return;
- login.hidden=!!session;$('logoutAuth').hidden=!session;if(!session){say('authStatus','');return;}
+ loginScreen(session);if(!session){say('authStatus','');return;}
  const user=guard(await client.auth.getUser()).user;if(epoch!==authEpoch)return;
  if(user?.app_metadata?.catalog_role!=='admin'){say('authStatus','У этой учётной записи нет роли администратора. Обратитесь к владельцу проекта.');return;}
  const aal=guard(await client.auth.mfa.getAuthenticatorAssuranceLevel());if(epoch!==authEpoch)return;
@@ -113,10 +136,10 @@ async function assess(){
  if(existing){factorId=existing.id;verify.hidden=false;say('mfaHint','Введите актуальный код из приложения-аутентификатора.');}
  else{$('enroll').hidden=false;say('mfaHint','Для доступа требуется привязать приложение-аутентификатор.');}
 }
-login.addEventListener('submit',e=>{e.preventDefault();busy(e,async()=>{const data=new FormData(login);const password=data.get('password');login.elements.namedItem('password').value='';guard(await client.auth.signInWithPassword({email:String(data.get('email')).trim(),password}));await assess();},'authStatus');});
+login.addEventListener('submit',e=>{e.preventDefault();busy(e,async()=>{rememberChoice();const data=new FormData(login);const password=data.get('password');login.elements.namedItem('password').value='';guard(await client.auth.signInWithPassword({email:String(data.get('email')).trim(),password}));await assess();},'authStatus');});
 $('enroll').addEventListener('click',e=>busy(e,async()=>{const r=guard(await client.auth.mfa.enroll({factorType:'totp',friendlyName:'KADUKOV test admin'}));factorId=r.id;say('secret',r.totp.secret);$('secretBox').hidden=false;$('enroll').hidden=true;verify.hidden=false;say('mfaHint','Добавьте ключ в приложение и введите код.');},'authStatus'));
 verify.addEventListener('submit',e=>{e.preventDefault();busy(e,async()=>{if(!factorId)throw Error('Сначала подключите фактор');const code=String(new FormData(verify).get('code'));guard(await client.auth.mfa.challengeAndVerify({factorId,code}));await assess();},'authStatus');});
-async function logout(){++authEpoch;locked();clearMfa();login.reset();try{guard(await client.auth.signOut({scope:'local'}));}catch{say('authStatus','Не удалось завершить серверную сессию. Закройте вкладку.');return;}await assess();}
+async function logout(){++authEpoch;locked();clearMfa();login.reset();$('emailSend').reset();$('emailVerify').reset();$('emailVerify').hidden=true;emailForCode='';try{guard(await client.auth.signOut({scope:'local'}));}catch{memory.clear();removeTab(sessionKey);removeTab(rememberKey);say('authStatus','Не удалось завершить серверную сессию. Закройте вкладку.');return;}memory.clear();removeTab(sessionKey);removeTab(rememberKey);removeTab(flowKey);$('rememberTab').checked=false;await assess();}
 $('logout').addEventListener('click',logout);$('logoutAuth').addEventListener('click',logout);
 function edit(x){if(!ready)return;editing=x;openPhotos(x);for(const k of fields){const el=form.elements.namedItem(k);if(k==='published')el.checked=x[k];else el.value=x[k]??'';}say('formTitle','Редактирование');say('formStatus','');form.scrollIntoView({block:'start'});form.elements.namedItem('name').focus();}
 async function load(){
@@ -133,6 +156,7 @@ form.addEventListener('submit',e=>{e.preventDefault();if(!ready)return;busy(e,as
  let result;if(editing)result=await client.from('catalog_products').update(data).eq('id',editing.id).eq('updated_at',editing.updated_at).select('id');else result=await client.from('catalog_products').insert(data).select('id');
  const rows=guard(result);if(rows.length!==1)throw Error('Запись не изменена: проверьте права или обновите данные после параллельного изменения.');const savedId=rows[0].id;const saved=guard(await client.from('catalog_products').select('*').eq('id',savedId).single());edit(saved);say('formStatus','Сохранено в Supabase. Можно загрузить фотографии.');await load();
  },'formStatus');});
-client.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){locked();clearMfa();login.hidden=false;$('logoutAuth').hidden=true;}});
+client.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){locked();clearMfa();loginScreen(null);removeTab(sessionKey);removeTab(rememberKey);$('rememberTab').checked=false;}});
+(async()=>{try{const q=new URLSearchParams(location.search);const code=q.get('code');const oauthError=q.get('error_description')||q.get('error');if(code||oauthError){history.replaceState(null,'',location.pathname);if(oauthError)throw Error('Вход через провайдера не завершён. Проверьте настройки.');if(readTab(flowKey)!=='google')throw Error('Неизвестный запрос входа. Повторите авторизацию.');removeTab(flowKey);guard(await client.auth.exchangeCodeForSession(code));}await assess();}catch(e){say('authStatus',message(e));}finally{removeTab(flowKey);}})();
 (async()=>{try{guard(await client.from('catalog_products').select('id').limit(1));say('connection','Подключение к каталогу установлено. Публичное чтение доступно.');}catch(e){say('connection','Проверка API не пройдена: '+message(e));}})();
 })();
