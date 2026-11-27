@@ -497,3 +497,92 @@ body .quick-dialog { border-radius: 14px; }
 @media (prefers-reduced-motion: reduce) {
   main#top::before, main#top::after, .main-photo { animation: none !important; transform: none !important; }
 }
+
+/* V3.2 — spacious dialogs, mobile app-like layout. */
+body dialog.quick-dialog {
+  box-sizing: border-box;
+  width: min(760px, calc(100% - 32px));
+  max-width: none;
+  max-height: min(850px, calc(100dvh - 32px));
+  padding: 0 24px 24px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-padding-top: 80px;
+}
+body #siteMapDialog { width: min(800px, calc(100% - 32px)); }
+body #accountDialog { width: min(520px, calc(100% - 32px)); }
+body .quick-dialog > header h2 { min-width: 0; overflow-wrap: anywhere; }
+body .quick-dialog > header > .square { flex: none; }
+body .quick-dialog :is(#request,#catalog,.formgrid,.field,#quickRequestContent,#quickCatalogContent) {
+  width: 100%;
+  min-width: 0;
+}
+body .quick-dialog :is(input:not([type="checkbox"]):not([type="radio"]),select,textarea) {
+  max-width: 100%;
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 450;
+}
+body .quick-dialog .field { gap: 5px; }
+body .quick-dialog .field-hint { overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  body dialog.quick-dialog,
+  body #siteMapDialog,
+  body #accountDialog {
+    position: fixed;
+    inset: 0;
+    margin: 0;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    height: 100dvh;
+    max-height: 100%;
+    max-height: 100dvh;
+    border: 0;
+    border-radius: 0;
+    padding: 0 max(12px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    box-shadow: none;
+    scroll-padding-top: 70px;
+    scrollbar-width: thin;
+  }
+  body .quick-dialog > header {
+    top: 0;
+    min-height: 58px;
+    padding: max(7px, env(safe-area-inset-top)) 0 7px;
+    margin: 0 0 13px;
+    gap: 8px;
+  }
+  body .quick-dialog > header h2 {
+    font-size: clamp(1.12rem, 5vw, 1.35rem);
+    line-height: 1.18;
+    text-wrap: pretty;
+  }
+  body .quick-dialog .window-tools { gap: 5px; }
+  body .quick-dialog .window-tools .square,
+  body .quick-dialog > header > .square {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+  }
+  body .quick-dialog #request { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  body .quick-dialog #request :is(input:not([type="checkbox"]),select,textarea),
+  body .quick-dialog .account-form input {
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+  body .quick-dialog #request textarea { min-height: 112px; }
+  body .quick-dialog .request-topic { padding: 10px 12px; }
+  body .quick-dialog .request-contact summary { padding: 10px 0; }
+  body .quick-dialog .request-buttons { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  body .quick-dialog .request-buttons .btn { min-height: 48px; padding: 9px 8px; font-size: 14px; }
+  body .quick-dialog .quick-info-footer .btn { min-height: 46px; }
+  body .quick-dialog .site-map { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width: 380px) {
+  body .quick-dialog .request-buttons { grid-template-columns: minmax(0,1fr); }
+  body .quick-dialog .request-buttons .btn { min-height: 46px; }
+}
