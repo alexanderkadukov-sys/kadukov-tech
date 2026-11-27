@@ -258,3 +258,63 @@ dialog.quick-dialog::backdrop { background: #0a20269e; backdrop-filter: blur(3px
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; }
 }
+
+/* Compact action controls — consistent, touch-friendly sizing. */
+body .request-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+body .request-buttons .btn,
+body .quick-info-footer .btn {
+  min-height: 44px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  border-radius: 8px;
+}
+body .request-buttons .btn:hover,
+body .mobilebar .btn:hover,
+body .quick-info-footer .btn:hover { transform: none; }
+@media (max-width: 760px) {
+  body .request-buttons .btn,
+  body .quick-info-footer .btn {
+    padding: 7px 8px;
+    font-size: 13px;
+    min-height: 44px;
+  }
+  body .mobilebar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 6px;
+    padding: 6px 12px calc(6px + env(safe-area-inset-bottom));
+  }
+  body .mobilebar .btn {
+    min-height: 44px;
+    min-width: 0;
+    padding: 6px 4px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.15;
+    border-radius: 8px;
+    text-align: center;
+  }
+  body .nav-action {
+    border-radius: 9px;
+    width: 44px;
+    min-height: 44px;
+  }
+  body .nav-action .ico { width: 20px; height: 20px; }
+  body .quick-search-fields { border-radius: 9px; }
+  body footer { padding: 20px 0 66px; }
+  body .footlinks { gap: 8px 14px; }
+  body .footlinks a { font-size: 13px; font-weight: 600; }
+  body .foot { gap: 12px; }
+}
+@media (max-width: 340px) {
+  body .request-buttons { grid-template-columns: 1fr; }
+  body .mobilebar .btn { font-size: 11px; }
+}
