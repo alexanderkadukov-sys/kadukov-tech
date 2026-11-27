@@ -213,11 +213,6 @@ html{scroll-padding-top:120px}
       <a class="quick-service" href="#order" data-quick-info="contact"><svg class="ico" aria-hidden="true"><use href="#profileIcon"/></svg><span class="service-label">Контакты</span></a>
     </div>
   </nav>
-  <div class="hub-quote">    <a class="hero-price" id="heroPrice" href="?price=s10-display" data-quick-info="s10-display" hidden>
-      <span class="hero-price-model">Экран Galaxy S10</span>
-      <strong id="heroPriceAmount"></strong>
-      <span class="hero-price-detail">In-Cell · с рамкой</span>
-    </a></div>
 </div></section>
 <section class="service-page" id="servicePage" aria-labelledby="servicePageTitle" hidden>
   <div class="service-page-hero">
@@ -1027,11 +1022,6 @@ const priceEntries = [
 ];
 const priceDate = '26.11.2026';
 const rubles = new Intl.NumberFormat('ru-RU', {style: 'currency', currency: 'RUB', maximumFractionDigits: 0});
-const featuredPart = priceEntries.find(product => product.id === 's10-display');
-if (featuredPart) {
-  $('#heroPriceAmount').textContent = rubles.format(featuredPart.price);
-  $('#heroPrice').hidden = false;
-}
 const partPriceDetails = 'Цена за деталь. Установка рассчитывается отдельно.';
 topics.push({
   key: 'prices', title: 'Прайс на технику и запчасти',
