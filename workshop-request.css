@@ -1,0 +1,115 @@
+.workshop-trust {
+  padding: 0 0 12px;
+}
+.workshop-trust-grid {
+  display: grid;
+  grid-template-columns: 1.35fr repeat(3, 1fr);
+  overflow: hidden;
+  border: 1px solid #b7d4d2;
+  border-radius: 12px;
+  background: var(--surface);
+}
+.workshop-trust-grid > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  padding: 7px 14px;
+  font-size: .8125rem;
+  color: var(--muted);
+}
+.workshop-trust-grid > div + div {
+  border-left: 1px solid var(--line);
+}
+.workshop-trust-grid strong {
+  color: var(--ink);
+  font-size: .96rem;
+  line-height: 1.15;
+}
+.workshop-trust-grid .workshop-rating {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-content: center;
+  column-gap: 6px;
+  background: #d0f4e7;
+  color: #244943;
+}
+.workshop-rating strong {
+  color: #124b3c;
+  font-size: 1.23rem;
+}
+.workshop-star {
+  align-self: center;
+  font-size: 1.05rem;
+  line-height: 1;
+  color: #89510a;
+}
+.workshop-rating span:last-child {
+  grid-column: 1 / -1;
+  line-height: 1.2;
+}
+#order.workshop-request {
+  padding: 0 0 30px;
+  background: transparent;
+}
+.workshop-request .ordergrid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+.workshop-request .orderbox {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  box-shadow: none;
+}
+.workshop-request .orderbox h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
+}
+.workshop-request .orderbox p {
+  margin: 2px 0 0;
+  color: var(--muted);
+}
+.workshop-request #request {
+  padding: 16px;
+  gap: 12px;
+}
+.workshop-request #message {
+  min-height: 88px;
+}
+.workshop-request #request .note {
+  margin: 0;
+}
+@media (max-width: 760px) {
+  .workshop-trust {
+    padding-bottom: 10px;
+  }
+  .workshop-trust-grid > div {
+    padding: 5px 6px;
+    font-size: .72rem;
+    line-height: 1.18;
+  }
+  .workshop-trust-grid strong {
+    font-size: .77rem;
+  }
+  .workshop-trust-grid .workshop-rating {
+    column-gap: 4px;
+  }
+  .workshop-rating strong {
+    font-size: 1.06rem;
+  }
+  .workshop-star {
+    font-size: .9rem;
+  }
+  .workshop-request .orderbox p {
+    font-size: .875rem;
+  }
+  .workshop-request #request {
+    padding: 12px;
+    gap: 10px;
+  }
+}

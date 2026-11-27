@@ -159,7 +159,7 @@ body #accountDialog .account-form button.btn { min-height:46px; }
   body dialog#accountDialog.quick-dialog[open] { inset:auto 0 0; margin:0 auto; width:100%; max-width:100%; height:auto; max-height:90dvh; border-radius:20px 20px 0 0; padding:14px 16px max(20px,env(safe-area-inset-bottom)); overflow-y:auto; }
   body #accountDialog > header { position:static; min-height:44px; padding:0 0 8px; }
 }
-</style><link rel="stylesheet" href="service-strip.css"></head><body><svg xmlns="http://www.w3.org/2000/svg" style="display:none"><defs>
+</style><link rel="stylesheet" href="service-strip.css"><link rel="stylesheet" href="workshop-request.css?v=1"><script src="verified-parts.js?v=1"></script><script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2" integrity="sha384-7i/4BYWz4Mn+lJfg2HWfEPfZQ7tmFKF3CTSKlXBpxWjNlLjcg+T6smpHG4gLmU1u" crossorigin="anonymous"></script></head><body><svg xmlns="http://www.w3.org/2000/svg" style="display:none"><defs>
 <symbol id="toolsIcon" viewBox="0 0 24 24"><path d="M14 7a5 5 0 0 0-6-5l2.5 2.5-1 3-3 1L4 6a5 5 0 0 0 6 6l8 8a2 2 0 0 0 3-3l-8-8a5 5 0 0 0 1-2Z"/></symbol>
 <symbol id="profileIcon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2"/></symbol>
 <symbol id="repair" viewBox="0 0 24 24"><rect x="5" y="2" width="12" height="20" rx="2"/><path d="M9 5h4m-3 14h2m9-11-5 5m1-5 4 4"/></symbol><symbol id="pc" viewBox="0 0 24 24"><rect x="3" y="3" width="13" height="18" rx="2"/><circle cx="9.5" cy="9" r="3"/><circle cx="9.5" cy="16" r="3"/><path d="M19 4v16m3-13v10"/></symbol><symbol id="shop" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6m-6 4h6m-6 4h4"/></symbol><symbol id="parts" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 2v3m6-3v3M9 19v3m6-3v3M2 9h3m-3 6h3m14-6h3m-3 6h3"/></symbol><symbol id="ai" viewBox="0 0 24 24"><path d="M12 2v20M12 4C6 0 2 6 5 10c-5 3-2 9 3 9 1 3 4 3 4 0m0-15c6-4 10 2 7 6 5 3 2 9-3 9-1 3-4 3-4 0M5 10l4 2m10-2-4 2"/></symbol><symbol id="study" viewBox="0 0 24 24"><path d="m2 9 10-5 10 5-10 5L2 9Zm4 2v6c4 3 8 3 12 0v-6m4-2v8"/></symbol><symbol id="digital" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4m-3-13-3 3 3 3m6-6 3 3-3 3"/></symbol><symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol><symbol id="moon" viewBox="0 0 24 24"><path d="M20 15a9 9 0 0 1-11-11 9 9 0 1 0 11 11Z"/></symbol><symbol id="menuicon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol><symbol id="check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol><symbol id="searchIcon" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol><symbol id="voiceIcon" viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="12.5" rx="3"/><path d="M5 11.5a7 7 0 0 0 14 0M12 18.5V22m-3 0h6"/></symbol><symbol id="phone" viewBox="0 0 24 24"><path d="M7 3H4c-1 9 8 18 17 17v-4l-5-2-2 3-7-7 3-2-3-5Z"/></symbol></defs></svg>
@@ -238,11 +238,15 @@ body #accountDialog .account-form button.btn { min-height:46px; }
     <div class="service-options" id="serviceOptions" role="group" aria-labelledby="serviceOptionsTitle"></div>
   </div>
 </section>
-<section class="hero" aria-label="Опыт работы"><div class="wrap"><div class="statstrip"><div class="stat"><b>7+ лет</b><small>Общий опыт работы</small></div><div class="stat"><b>★ 5,0</b><small>Рейтинг Авито по профилю</small></div><div class="stat"><b>4+ года</b><small>Собственный сервис</small></div><div class="stat"><b>По РФ</b><small>Консультации онлайн</small></div></div></div></section>
-<section class="section" id="services" hidden><div class="wrap"><div class="sectionhead"><div><div class="eyebrow">01 / НАПРАВЛЕНИЯ</div><h2>Всё, что нужно для техники.</h2></div><p>Выберите задачу — подберу решение, согласую стоимость и сроки.</p></div><div class="services" id="servicesGrid"></div></div></section>
-<section class="section" id="electronics" hidden><div class="wrap"><div class="sectionhead"><div><div class="eyebrow">02 / ПОДБОР</div><h2>Подберём технику и запчасти.</h2></div><p>Примеры задач по подбору электроники и совместимых запчастей.</p></div><div class="catalogs"><article class="panel catalog-card"><div class="eyebrow">01 / ТЕХНИКА</div><h3>Подбор электроники</h3><p>Смартфоны, ПК, ноутбуки, периферия и аксессуары.</p><div class="tags"><span class="tag">Apple</span><span class="tag">Samsung</span><span class="tag">Xiaomi</span><span class="tag">Новая и б/у</span></div><button class="btn" data-catalog="electronics" data-scroll="true">Варианты подбора</button></article><article class="panel catalog-card" id="parts-catalog"><div class="eyebrow">02 / КОМПЛЕКТУЮЩИЕ</div><h3>Каталог запчастей</h3><p>Дисплеи, аккумуляторы, шлейфы, платы зарядки и другие детали.</p><div class="tags"><span class="tag">По модели</span><span class="tag">Оригинал / аналог</span><span class="tag">Для сервисов</span></div><button class="btn" data-catalog="parts" data-scroll="true">Подобрать запчасть ↗</button></article></div><div class="panel catalog-browser" id="catalog"><div class="tabs"><button data-catalog="electronics" class="active">Электроника</button><button data-catalog="parts">Запчасти</button></div><div class="filters"><input id="search" aria-label="Поиск по каталогу" placeholder="Поиск по названию или модели"><select id="filter" aria-label="Категория"><option value="">Все категории</option></select></div><div class="items" id="items"></div><p class="note">Добавьте подходящий пример в «Мой запрос» или опишите точную модель и нужную деталь.</p></div></div></section>
-<section class="section" id="about"><div class="wrap"><div class="sectionhead"><div><div class="eyebrow">03 / ОБО МНЕ</div><h2>За сайтом — реальный мастер.</h2></div><p>Профессиональный подход, прозрачные условия и индивидуальная работа с каждым клиентом.</p></div><div class="aboutgrid"><article class="panel bio"><h3>Александр Кадуков</h3><p>Занимаюсь ремонтом электроники, подбором техники и комплектующих, а также цифровыми услугами. Опыт работы в DNS, управления сервисным центром и создания AI-контента помогает комплексно решать технические задачи.</p><div class="timeline"><div><b>2019–2022 · DNS</b><small>Работа с цифровой и бытовой техникой</small></div><div><b>С 2022 · Сервисный центр</b><small>Ремонт электроники и руководство сервисом</small></div><div><b>С 2024 · Цифровые услуги</b><small>Видеомонтаж и AI-контент</small></div></div></article><article class="panel steps"><h3>Как обсудить задачу</h3><ol><li><div><b>Расскажите о задаче</b><small>Модель устройства, неисправность или желаемый товар.</small></div></li><li><div><b>Согласуем стоимость</b><small>Уточним стоимость, сроки и формат работы.</small></div></li><li><div><b>Выполню работу</b><small>Ремонт, сборка, подбор техники или цифровая услуга.</small></div></li><li><div><b>Получите результат</b><small>Личная встреча или дистанционная консультация по договорённости.</small></div></li></ol></article></div></div></section>
-<section class="section" id="order"><div class="wrap ordergrid"><div class="orderbox"><div class="eyebrow">04 / НА СВЯЗИ</div><h2>Обсудим вашу задачу.</h2><p>Расскажите, что нужно отремонтировать, подобрать, собрать или изучить.</p><p><strong>+7 (915) 648-42-38</strong><br>Ежедневно, 10:00–21:00<br>Москва · по договорённости</p><div class="actions"><a class="btn alt" href="tel:+79156484238">Позвонить</a><a class="btn alt" href="https://t.me/Kaduk0v" target="_blank" rel="noopener">Telegram ↗</a><a class="btn alt" href="https://vk.ru/phoneugra" target="_blank" rel="noopener">ВКонтакте ↗</a></div></div><form class="panel formgrid" id="request">
+<section class="workshop-trust" aria-label="Рейтинг и опыт мастерской">
+  <div class="wrap workshop-trust-grid">
+    <div class="workshop-rating"><span class="workshop-star" aria-hidden="true">★</span><strong>5,0</strong><span>Рейтинг на Авито</span></div>
+    <div><strong>7+ лет</strong><span>опыта</span></div>
+    <div><strong>4+ года</strong><span>свой сервис</span></div>
+    <div><strong>По России</strong><span>онлайн</span></div>
+  </div>
+</section>
+<section class="section workshop-request" id="order" aria-labelledby="workshopRequestHeading"><div class="wrap ordergrid"><div class="orderbox"><h2 id="workshopRequestHeading">Опишите задачу</h2><p>Укажите модель устройства и расскажите, что нужно сделать.</p></div><form class="panel formgrid" id="request">
   <label class="field full"><span class="field-title">Что вас интересует?</span><select id="service" required></select></label>
   <p class="request-topic full" id="requestTopic" role="status" hidden></p>
   <label class="field full" id="requestContext" hidden>
@@ -274,6 +278,10 @@ body #accountDialog .account-form button.btn { min-height:46px; }
   <p class="request-status full" id="requestStatus" role="status"></p>
   <label class="field full" id="copyFallback" hidden>Текст запроса<textarea id="copyText" readonly></textarea></label>
 </form></div></section>
+<section class="section" id="services" hidden><div class="wrap"><div class="sectionhead"><div><div class="eyebrow">01 / НАПРАВЛЕНИЯ</div><h2>Всё, что нужно для техники.</h2></div><p>Выберите задачу — подберу решение, согласую стоимость и сроки.</p></div><div class="services" id="servicesGrid"></div></div></section>
+<section class="section" id="electronics" hidden><div class="wrap"><div class="sectionhead"><div><div class="eyebrow">02 / ПОДБОР</div><h2>Подберём технику и запчасти.</h2></div><p>Примеры задач по подбору электроники и совместимых запчастей.</p></div><div class="catalogs"><article class="panel catalog-card"><div class="eyebrow">01 / ТЕХНИКА</div><h3>Подбор электроники</h3><p>Смартфоны, ПК, ноутбуки, периферия и аксессуары.</p><div class="tags"><span class="tag">Apple</span><span class="tag">Samsung</span><span class="tag">Xiaomi</span><span class="tag">Новая и б/у</span></div><button class="btn" data-catalog="electronics" data-scroll="true">Варианты подбора</button></article><article class="panel catalog-card" id="parts-catalog"><div class="eyebrow">02 / КОМПЛЕКТУЮЩИЕ</div><h3>Каталог запчастей</h3><p>Дисплеи, аккумуляторы, шлейфы, платы зарядки и другие детали.</p><div class="tags"><span class="tag">По модели</span><span class="tag">Оригинал / аналог</span><span class="tag">Для сервисов</span></div><button class="btn" data-catalog="parts" data-scroll="true">Подобрать запчасть ↗</button></article></div><div class="panel catalog-browser" id="catalog"><div class="tabs"><button data-catalog="electronics" class="active">Электроника</button><button data-catalog="parts">Запчасти</button></div><div class="filters"><input id="search" aria-label="Поиск по каталогу" placeholder="Поиск по названию или модели"><select id="filter" aria-label="Категория"><option value="">Все категории</option></select></div><div class="items" id="items"></div><p class="note">Добавьте подходящий пример в «Мой запрос» или опишите точную модель и нужную деталь.</p></div></div></section>
+<section class="section" id="about"><div class="wrap"><div class="sectionhead"><div><div class="eyebrow">03 / ОБО МНЕ</div><h2>За сайтом — реальный мастер.</h2></div><p>Профессиональный подход, прозрачные условия и индивидуальная работа с каждым клиентом.</p></div><div class="aboutgrid"><article class="panel bio"><h3>Александр Кадуков</h3><p>Занимаюсь ремонтом электроники, подбором техники и комплектующих, а также цифровыми услугами. Опыт работы в DNS, управления сервисным центром и создания AI-контента помогает комплексно решать технические задачи.</p><div class="timeline"><div><b>2019–2022 · DNS</b><small>Работа с цифровой и бытовой техникой</small></div><div><b>С 2022 · Сервисный центр</b><small>Ремонт электроники и руководство сервисом</small></div><div><b>С 2024 · Цифровые услуги</b><small>Видеомонтаж и AI-контент</small></div></div></article><article class="panel steps"><h3>Как обсудить задачу</h3><ol><li><div><b>Расскажите о задаче</b><small>Модель устройства, неисправность или желаемый товар.</small></div></li><li><div><b>Согласуем стоимость</b><small>Уточним стоимость, сроки и формат работы.</small></div></li><li><div><b>Выполню работу</b><small>Ремонт, сборка, подбор техники или цифровая услуга.</small></div></li><li><div><b>Получите результат</b><small>Личная встреча или дистанционная консультация по договорённости.</small></div></li></ol></article></div></div></section>
+
 <section class="section faq" id="delivery" hidden><div class="wrap"><div class="sectionhead"><div><div class="eyebrow">05 / УСЛОВИЯ</div><h2>Условия работы.</h2></div></div><details><summary>Можно ли обратиться из другого города?</summary><p>Подбор техники, консультации и цифровые услуги можно обсудить дистанционно. Если для работы нужна личная встреча или передача устройства, согласуем это заранее.</p></details><details><summary>Как оплачиваются ремонт и цифровые услуги?</summary><p>Стоимость ремонта согласуется до выполнения работ, оплата после выполнения, если не оговорено иное. Для цифровых услуг стоимость зависит от объёма и сложности. Возможность поэтапной оплаты обсуждается заранее.</p></details><details><summary>Как проверить совместимость запчасти?</summary><p>Укажите точную модель устройства, при необходимости артикул и маркировку. Объясню, как проверить совместимость, тип детали и маркировку.</p></details><details><summary>Восстанавливаете доступ к аккаунтам?</summary><p>Помогаю законным владельцам создавать и восстанавливать доступ к Apple Account и Google официальными способами. Условия подписок и настройки сервисов уточняются индивидуально.</p></details></div></section></main><footer><div class="wrap foot"><div class="footlinks"><a href="?view=map" data-site-view="map">Карта сайта</a><a href="?view=map" data-quick-info="payment">Условия работы</a><a href="?view=map" data-quick-info="contact">Контакты</a></div><small>© 2026</small></div></footer><div class="mobilebar"><a class="btn alt" href="tel:+79156484238">Позвонить</a><a class="btn alt" href="https://t.me/Kaduk0v" target="_blank" rel="noopener">Telegram</a><a class="btn" href="#order" data-focus>Описать задачу</a></div><dialog class="modal quick-dialog" id="cartDialog" aria-labelledby="cartDialogTitle"><header><h2 id="cartDialogTitle" tabindex="-1">Мой запрос</h2><button type="button" class="square" id="closeCart" data-close-quick aria-label="Закрыть">×</button></header><p class="muted">Выбранные позиции можно приложить к описанию задачи.</p><div id="cartItems"></div><button class="btn" id="checkout" style="margin-top:16px;width:100%">Добавить к задаче</button></dialog><div class="toast hide" id="toast" role="status"></div>
 <dialog class="modal quick-dialog" id="quickRequestDialog" aria-labelledby="quickRequestTitle">
 <header><h2 id="quickRequestTitle" tabindex="-1">Опишите задачу</h2><button type="button" class="square" data-close-quick aria-label="Закрыть">×</button></header>
@@ -995,29 +1003,8 @@ const partVariantExclusions = {
   speaker: /верхн|слухов|разговорн|передн|earpiece|оригинал/,
   rearCamera: /фронт|передн|селфи|face id|оригинал|aasp|защитн|вспышк|линз|ультраширок/,
 };
-// BEGIN VERIFIED PARTS
-const verifiedParts = [
-  {"id":"a51-charge-board","name":"Нижняя плата зарядки для Samsung Galaxy A51 4G (SM-A515F)","variant":"USB-C, разъём гарнитуры и микрофон в сборе","models":["a51"],"part":"charge","variantCheck":"board","action":3,"price":225,"checked":"26.11.2026"},
-  {"id":"s10-charge-port","name":"Разъём USB-C для Samsung Galaxy S10 и S10e","variant":"SM-G973F и SM-G970F · отдельный разъём под пайку","models":["s10","s10e"],"part":"charge","variantCheck":"port","action":3,"price":168,"checked":"26.11.2026"},
-  {"id":"redmi-note-8-charge-board","name":"Нижняя плата зарядки для Redmi Note 8 и Note 8 2021","variant":"M1908C3JC / M1908C3JGG · разъём зарядки, гарнитуры и микрофон","models":["redmiNote8"],"part":"charge","variantCheck":"board","action":3,"price":248,"checked":"26.11.2026"},
-  {"id":"iphone-11-charge-flex","name":"Шлейф зарядки для iPhone 11 (A2221)","variant":"Чёрный · разъём Lightning и микрофон","models":["iphone11"],"part":"charge","variantCheck":"flex","action":3,"price":349,"checked":"26.11.2026"},
-  {"id":"iphone-12-charge-flex","name":"Шлейф зарядки для iPhone 12 и 12 Pro (A2403 / A2407)","variant":"Чёрный · разъём Lightning и микрофон","models":["iphone12"],"part":"charge","variantCheck":"flex","action":3,"price":716,"checked":"26.11.2026"},
-  {"id":"s10-rear-cover","name":"Задняя крышка для Samsung Galaxy S10 (SM-G973F)","variant":"Чёрная задняя крышка","models":["s10"],"part":"cover","variantCheck":"cover","action":4,"price":349,"checked":"26.11.2026"},
-  {"id":"iphone-11-camera-glass","name":"Стекло задней камеры для iPhone 11 (A2221)","variant":"Чёрное · комплект из 2 стёкол без рамок","models":["iphone11"],"part":"cameraGlass","variantCheck":"cameraGlass","action":4,"price":168,"checked":"26.11.2026"},
-  {"id":"iphone-11-speaker","name":"Нижний динамик для iPhone 11 (A2221)","variant":"Полифонический динамик (бузер) в сборе","models":["iphone11"],"part":"speaker","variantCheck":"speaker","action":4,"price":371,"checked":"26.11.2026"},
-  {"id":"redmi-9-bn56","name":"Аккумулятор BN56 для Xiaomi Redmi 9A и 9C","variant":"5 000 мА·ч · литий-ионный","models":["redmi9"],"part":"battery","variantCheck":"battery","action":2,"price":600,"checked":"26.11.2026"},
-  {"id":"iphone-11-rear-camera","name":"Задняя камера для iPhone 11 (A2221)","variant":"Основной модуль, аналог","models":["iphone11"],"part":"camera","variantCheck":"rearCamera","action":4,"price":1505,"checked":"26.11.2026"}
-];
-// END VERIFIED PARTS
 const priceEntries = [
-  {
-    id: 's10-display', name: 'Дисплей для Samsung Galaxy S10 (SM-G973F)', price: 1884,
-    variant: 'In-Cell, чёрный, с рамкой',
-    details: 'Цена за деталь. Установка рассчитывается отдельно. У этого модуля не работают сканер отпечатка и автояркость.',
-    models: ['s10'], part: 'display', variantCheck: 'display',
-    service: 'parts', action: 1
-  },
-  ...verifiedParts.map(product => ({...product, service: 'parts'})),
+  ...(window.kadukovVerifiedParts || []).map(product => ({...product, service: 'parts'})),
   {
     id: 'iphone-16', name: 'Apple iPhone 16, 128 ГБ, чёрный, только eSIM', price: 65169,
     variant: 'Смартфон, 128 ГБ, чёрный, только eSIM',
@@ -1549,30 +1536,16 @@ $('#catalogCart').onclick = () => {
 
 const accountSettings = {url: 'https://qlggbdzodqagtxqifslg.supabase.co', publishableKey: 'sb_publishable_xmpxNkuvDizZoYOl12CJCw_lM-h9kSW'};
 
-function makeAccountClient(settings, request = fetch) {
-  if (!/^https:\/\/[a-z0-9]{20}\.supabase\.co\/?$/.test(settings.url) ||
+function makeAccountClient(settings) {
+  if (!window.supabase?.createClient || !/^https:\/\/[a-z0-9]{20}\.supabase\.co$/.test(settings.url) ||
       !/^sb_publishable_[A-Za-z0-9_-]{12,}$/.test(settings.publishableKey)) return null;
-  const root = settings.url.replace(/\/$/, '') + '/auth/v1/';
-  async function post(path, body, signal, token) {
-    const headers = {apikey: settings.publishableKey};
-    if (body) headers['Content-Type'] = 'application/json';
-    if (token) headers.Authorization = 'Bearer ' + token;
-    const response = await request(root + path, {
-      method: 'POST', headers, body: body ? JSON.stringify(body) : undefined,
-      cache: 'no-store', credentials: 'omit', redirect: 'error', signal
-    });
-    if (!response.ok) {
-      const error = new Error('Authentication request failed');
-      error.status = response.status;
-      throw error;
-    }
-    return path.startsWith('verify') ? response.json() : null;
-  }
-  return {
-    send: (email, register, signal) => post('otp', {email, create_user: register}, signal),
-    verify: (email, token, signal) => post('verify', {email, token, type: 'email'}, signal),
-    signOut: (token, signal) => post('logout?scope=local', null, signal, token)
-  };
+  let storage;
+  try { storage = window.sessionStorage; } catch {}
+  return window.supabase.createClient(settings.url, settings.publishableKey, {
+    auth: {storage, persistSession: Boolean(storage), storageKey: 'kadukov-customer-session-v1',
+      autoRefreshToken: true, detectSessionInUrl: false},
+    global: {fetch: (url, options) => fetch(url, {...options, signal: AbortSignal.timeout?.(12000)})}
+  }).auth;
 }
 
 const accountEmailForm = $('#accountEmailForm');
@@ -1585,21 +1558,19 @@ const accountGuestControls = [...accountModes, ...accountEmailForm.elements, ...
 const previewCode = '246810';
 const accountPreviewSession = 'kadukov-account-preview-v1';
 const accountPreview = location.protocol === 'file:' || ['127.0.0.1', 'localhost', '[::1]'].includes(location.hostname);
-const accountClient = accountPreview ? null : makeAccountClient(accountSettings);
+let accountClient;
 let accountMode = 'login';
 let pendingEmail = '';
 let accountOperation;
-let liveMember;
-let sessionTimer;
+let liveEmail = '';
 
-$('#accountGuest').hidden = !accountPreview && !accountClient;
+$('#accountGuest').hidden = !accountPreview;
 $('#accountPreviewNote').hidden = !accountPreview;
 if (accountPreview) {
   accountEmail.value = 'demo@example.com';
   accountEmail.readOnly = true;
-} else if (!accountClient) {
-  $('#accountLabel').textContent = 'Кабинет';
-  accountStatus.textContent = 'Вход временно недоступен. Обратитесь к мастеру через раздел «Контакты».';
+} else {
+  accountStatus.textContent = 'Подключаем вход…';
 }
 function resetAccountCode() {
   pendingEmail = '';
@@ -1623,32 +1594,44 @@ function updatePreviewSession(member) {
   } catch {}
   renderAccount(member ? accountEmail.value : '');
 }
-function clearLiveSession() {
-  clearTimeout(sessionTimer);
-  liveMember = undefined;
-  renderAccount('');
-}
 function accountBusy(busy) {
   accountGuestControls.forEach(control => { control.disabled = busy; });
   $('#accountSignOut').disabled = busy;
 }
 async function runAccountAction(action, onFailure) {
   if (accountOperation) return;
-  const controller = new AbortController();
-  accountOperation = controller;
+  accountOperation = true;
   accountBusy(true);
-  const timeout = setTimeout(() => controller.abort(), 12000);
   try {
-    await action(controller.signal);
+    await action();
   } catch (error) {
-    if (accountOperation === controller) onFailure(error);
+    if (accountDialog.open) onFailure(error);
   } finally {
-    clearTimeout(timeout);
-    if (accountOperation === controller) {
-      accountOperation = undefined;
-      accountBusy(false);
-    }
+    accountOperation = false;
+    accountBusy(false);
   }
+}
+function syncLiveAccount(session) {
+  const email = session?.user?.is_anonymous ? '' : (session?.user?.email || '');
+  if (email === liveEmail) return;
+  liveEmail = email;
+  renderAccount(email);
+}
+if (!accountPreview) {
+  document.addEventListener('DOMContentLoaded', () => {
+    accountClient = makeAccountClient(accountSettings);
+    if (!accountClient) {
+      accountStatus.textContent = 'Вход временно недоступен. Обратитесь к мастеру через раздел «Контакты».';
+      return;
+    }
+    accountClient.onAuthStateChange((event, session) => {
+      if (event === 'INITIAL_SESSION' && !session) {
+        accountStatus.textContent = '';
+        $('#accountGuest').hidden = false;
+      }
+      syncLiveAccount(session);
+    });
+  }, {once: true});
 }
 for (const mode of accountModes) {
   mode.addEventListener('click', () => {
@@ -1672,9 +1655,12 @@ accountEmailForm.addEventListener('submit', async event => {
   else if (accountClient) {
     const email = accountEmail.value.trim().toLowerCase();
     accountStatus.textContent = 'Запрашиваем код…';
-    await runAccountAction(async signal => {
-      await accountClient.send(email, accountMode === 'register', signal);
-      if (!signal.aborted) requestCodeStep(email);
+    await runAccountAction(async () => {
+      const {error} = await accountClient.signInWithOtp({
+        email, options: {shouldCreateUser: accountMode === 'register'}
+      });
+      if (error) throw error;
+      if (accountDialog.open) requestCodeStep(email);
     }, error => {
       accountStatus.textContent = error.status === 429
         ? 'Достигнут лимит отправки писем. Проверьте входящие или попробуйте позже.'
@@ -1696,19 +1682,14 @@ accountCodeForm.addEventListener('submit', async event => {
     }
   } else if (accountClient && pendingEmail) {
     accountStatus.textContent = 'Проверяем код…';
-    await runAccountAction(async signal => {
-      const session = await accountClient.verify(pendingEmail, code, signal);
-      if (signal.aborted) return;
-      if (!session?.user?.id || session.user.is_anonymous || !session.user.email ||
-          typeof session.access_token !== 'string' || !session.access_token || !Number.isFinite(session.expires_in) ||
-          session.expires_in <= 0) throw new Error('Incomplete session');
-      liveMember = {email: session.user.email, token: session.access_token};
-      sessionTimer = setTimeout(() => {
-        clearLiveSession();
-        if (accountDialog.open) accountStatus.textContent = 'Срок входа истёк. Получите новый код.';
-      }, Math.min(session.expires_in * 1000, 2147483647));
-      renderAccount(liveMember.email);
-      $('#accountTitle').focus();
+    await runAccountAction(async () => {
+      const {data, error} = await accountClient.verifyOtp({
+        email: pendingEmail, token: code, type: 'email'
+      });
+      if (error) throw error;
+      if (!data.session || !data.user?.email || data.user.is_anonymous) throw new Error('Incomplete session');
+      syncLiveAccount(data.session);
+      if (accountDialog.open) $('#accountTitle').focus();
     }, error => {
       accountStatus.textContent = error.status === 429
         ? 'Слишком много попыток. Подождите и попробуйте ещё раз.'
@@ -1725,24 +1706,21 @@ $('#accountChangeEmail').addEventListener('click', () => {
 });
 $('#accountSignOut').addEventListener('click', async () => {
   if (accountPreview) updatePreviewSession(false);
-  else if (liveMember) {
-    const token = liveMember.token;
-    clearLiveSession();
-    await runAccountAction(signal => accountClient.signOut(token, signal), () => {
-      if (accountDialog.open) accountStatus.textContent = 'Вход в этой вкладке завершён.';
+  else if (accountClient && liveEmail) {
+    await runAccountAction(async () => {
+      const {error} = await accountClient.signOut({scope: 'local'});
+      if (error) throw error;
+      syncLiveAccount(null);
+    }, () => {
+      accountStatus.textContent = 'Не удалось выйти. Проверьте подключение и повторите.';
     });
   }
   if (accountDialog.open) $('#accountTitle').focus();
 });
-if (accountPreview || accountClient) {
-  accountDialog.addEventListener('close', () => {
-    accountOperation?.abort();
-    accountOperation = undefined;
-    accountBusy(false);
-    resetAccountCode();
-    if (accountClient) accountEmail.value = '';
-  });
-}
+accountDialog.addEventListener('close', () => {
+  if (accountPreview || accountClient) resetAccountCode();
+  if (accountClient) accountEmail.value = '';
+});
 if (accountPreview) {
   try {
     if (sessionStorage.getItem(accountPreviewSession) === 'signed-in') renderAccount(accountEmail.value);
