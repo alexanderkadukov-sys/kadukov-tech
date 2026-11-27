@@ -337,6 +337,10 @@ body #accountDialog .account-form button.btn { min-height:46px; }
 </dialog>
 <dialog class="modal quick-dialog" id="accountDialog" aria-labelledby="accountTitle">
   <header><h2 id="accountTitle" tabindex="-1">Личный кабинет</h2><button type="button" class="square" data-close-quick aria-label="Закрыть">×</button></header>
+  <div id="accountTelegramBrowser" hidden>
+    <p class="window-intro">Чтобы войти в кабинет из Telegram, откройте его в браузере.</p>
+    <a class="btn" id="openAccountBrowser" href="https://alexanderkadukov-sys.github.io/kadukov-tech/?view=account" target="_blank" rel="noopener noreferrer">Открыть кабинет в браузере</a>
+  </div>
   <div id="accountGuest" hidden>
     <p class="preview-note" id="accountPreviewNote">Предпросмотр. Тестовый код отображается на экране, письма не отправляются.</p>
     <div class="account-options" id="accountOptions" hidden>
@@ -381,6 +385,43 @@ body #accountDialog .account-form button.btn { min-height:46px; }
   <p id="accountStatus" class="account-status" role="status"></p>
 </dialog>
 <script>
+const telegramMiniApp = (() => {
+  const params = new URLSearchParams(location.search);
+  const start = params.get('from') === 'telegram' || new URLSearchParams(location.hash.slice(1)).has('tgWebAppPlatform');
+  let active = start;
+  try {
+    if (start) sessionStorage.setItem('kadukov-telegram-mini-app', 'yes');
+    active = active || sessionStorage.getItem('kadukov-telegram-mini-app') === 'yes';
+  } catch {}
+  if (active) {
+    const sdk = document.createElement('script');
+    sdk.src = 'https://telegram.org/js/telegram-web-app.js?62';
+    sdk.crossOrigin = 'anonymous';
+    sdk.integrity = 'sha384-Vfd/BDDodKSHihoWEYUp7viIzknmkv8bWNw7o3LJsq4ziOpCagWvXEZLJH5cAgh0';
+    sdk.addEventListener('load', () => window.Telegram?.WebApp?.ready?.(), {once: true});
+    document.head.append(sdk);
+  }
+  return active;
+})();
+
+function openInTelegramApp(method, url) {
+  if (!telegramMiniApp) return false;
+  const app = window.Telegram?.WebApp;
+  if (!app || app.platform === 'unknown' || typeof app[method] !== 'function') return false;
+  try { app[method](url); return true; } catch { return false; }
+}
+
+if (telegramMiniApp) {
+  document.getElementById('openAccountBrowser').addEventListener('click', event => {
+    if (openInTelegramApp('openLink', event.currentTarget.href)) event.preventDefault();
+  });
+  document.addEventListener('click', event => {
+    const link = event.target.closest('a[href^="https://t.me/"]');
+    if (!link || event.defaultPrevented || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    if (openInTelegramApp('openTelegramLink', link.href)) event.preventDefault();
+  });
+}
+
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];const ico=n=>`<svg class="ico" aria-hidden="true"><use href="#${n}"/></svg>`;const services=[['repair','Ремонт смартфонов и компьютеров','Диагностика, дисплеи, пайка, ремонт ноутбуков, Windows и обслуживание.','Обсудить ремонт','Ремонт смартфонов и компьютеров'],['pc','Сборка ПК под заказ','Игровые, офисные и рабочие станции. Подбор под бюджет, сборка и тестирование.','Подобрать компьютер','Сборка ПК под заказ'],['shop','Подбор электроники','Смартфоны, ноутбуки, ПК, наушники, аксессуары. Новая и б/у техника.','Смотреть электронику','electronics'],['parts','Запчасти для смартфонов','Дисплеи, аккумуляторы, платы и шлейфы. Подбор по совместимости.','Смотреть запчасти','parts'],['ai','Курсы по нейросетям','ChatGPT, генерация изображений и видео, автоматизация, индивидуальные занятия.','Узнать об обучении','Курсы по нейросетям'],['study','Учебные проекты','Консультации по рефератам и курсовым, план, источники, редактура, оформление и презентации.','Обсудить задачу','Учебные проекты'],['digital','Цифровые услуги','Apple Account и Google: создание, настройка и восстановление доступа владельцами. Помощь с подпиской ChatGPT, видеомонтаж, логотипы, AI-контент и создание курсов.','Выбрать услугу','Цифровые услуги']];$('#servicesGrid').innerHTML=services.map((s,i)=>`<article class="service ${i===0?'feature':''} ${i===6?'wide':''}"><div class="symbol">${ico(s[0])}</div><span class="num">0${i+1}</span><div><h3>${s[1]}</h3><p class="muted">${s[2]}</p></div><a class="more" ${['electronics','parts'].includes(s[4])?`href="#catalog" data-catalog="${s[4]}"`:`href="#order" data-service="${s[4]}"`}>${s[3]} ${ico('arrow')}</a></article>`).join('');const opts=[...services.filter(s=>!['electronics','parts'].includes(s[4])).map(s=>s[4]),'Подбор техники','Запчасти для смартфонов','Создание и настройка Apple Account','Создание и настройка аккаунта Google','Восстановление доступа к Google','Помощь с подпиской ChatGPT','Видеомонтаж и дизайн','Другой вопрос'];$('#service').innerHTML='<option value="">Выберите направление</option>'+opts.map(x=>`<option>${x}</option>`).join('');
 const data={electronics:[['Смартфоны Apple iPhone','Смартфоны','Подбор модели, памяти и комплектации'],['Смартфоны Samsung Galaxy','Смартфоны','Подбор модели и комплектации'],['Смартфоны Xiaomi / POCO','Смартфоны','Подбор модели под бюджет'],['Ноутбуки','Компьютеры','Для работы, учёбы или игр'],['Компьютеры и мониторы','Компьютеры','Готовые решения и подбор'],['Наушники и аксессуары','Аксессуары','Подбор совместимых устройств']],parts:[['Дисплей iPhone 11','Дисплеи','Уточнить качество и совместимость'],['Дисплей iPhone XR','Дисплеи','Уточнить качество и совместимость'],['Дисплей iPhone 12 / 12 Pro','Дисплеи','Уточнить тип матрицы и совместимость'],['Дисплей iPhone 13','Дисплеи','Подбор типа матрицы'],['Аккумуляторы смартфонов','Аккумуляторы','По точной модели'],['Платы зарядки и шлейфы','Платы и шлейфы','По артикулу и ревизии'],['Корпуса, крышки и камеры','Другие детали','По модели устройства']]};
 const repair = 'Ремонт смартфонов и компьютеров';
@@ -706,7 +747,7 @@ request.addEventListener('submit', event => {
   saveDraft();
   const url = new URL('https://t.me/Kaduk0v');
   url.searchParams.set('text', text);
-  window.open(url.href, '_blank', 'noopener,noreferrer');
+  if (!openInTelegramApp('openTelegramLink', url.href)) window.open(url.href, '_blank', 'noopener,noreferrer');
   requestStatus.textContent = 'Черновик подготовлен. Для отправки нажмите «Отправить» в Telegram.';
 });
 $('#copyRequest').addEventListener('click', async () => {
@@ -1617,6 +1658,8 @@ $('#accountPreviewNote').hidden = !accountPreview;
 if (accountPreview) {
   accountEmail.value = 'demo@example.com';
   accountEmail.readOnly = true;
+} else if (telegramMiniApp) {
+  $('#accountTelegramBrowser').hidden = false;
 } else {
   accountStatus.textContent = 'Подключаем вход…';
 }
@@ -1689,7 +1732,7 @@ async function finishAccountRedirect() {
   });
 }
 
-if (!accountPreview) {
+if (!accountPreview && !telegramMiniApp) {
   document.addEventListener('DOMContentLoaded', () => {
     accountClient = makeAccountClient(accountSettings);
     if (!accountClient) {
