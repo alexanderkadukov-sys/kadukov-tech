@@ -155,6 +155,13 @@ html{scroll-padding-top:120px}
 body #accountDialog #accountStatus:empty { display:none; }
 body #accountDialog .account-modes { margin:12px 0; }
 body #accountDialog .account-form button.btn { min-height:46px; }
+.account-options { display:grid; gap:8px; margin:12px 0; }
+.account-options .btn { width:100%; min-height:46px; text-align:center; }
+.account-options .auth-hint { margin:0 0 4px; font-size:.86rem; }
+.account-email-option { padding:12px; border:1px solid var(--line); border-radius:12px; }
+.account-email-option > summary { cursor:pointer; font-weight:650; }
+.account-key-actions { margin:12px 0; }
+.account-key-actions .auth-hint { margin:6px 0 0; font-size:.86rem; }
 @media(max-width:760px) {
   body dialog#accountDialog.quick-dialog[open] { inset:auto 0 0; margin:0 auto; width:100%; max-width:100%; height:auto; max-height:90dvh; border-radius:20px 20px 0 0; padding:14px 16px max(20px,env(safe-area-inset-bottom)); overflow-y:auto; }
   body #accountDialog > header { position:static; min-height:44px; padding:0 0 8px; }
@@ -319,26 +326,39 @@ body #accountDialog .account-form button.btn { min-height:46px; }
 <dialog class="modal quick-dialog" id="accountDialog" aria-labelledby="accountTitle">
   <header><h2 id="accountTitle" tabindex="-1">Личный кабинет</h2><button type="button" class="square" data-close-quick aria-label="Закрыть">×</button></header>
   <div id="accountGuest" hidden>
-    <p class="window-intro">Вход и регистрация по коду из письма.</p>
     <p class="preview-note" id="accountPreviewNote">Предпросмотр. Тестовый код отображается на экране, письма не отправляются.</p>
-    <div class="account-modes" id="accountModes" role="group" aria-label="Вход или регистрация">
-      <button type="button" data-account-mode="login" aria-pressed="true">Войти</button>
-      <button type="button" data-account-mode="register" aria-pressed="false">Создать аккаунт</button>
+    <div class="account-options" id="accountOptions" hidden>
+      <button type="button" class="btn" data-account-provider="custom:telegram" hidden>Продолжить через Telegram</button>
+      <button type="button" class="btn alt" data-account-provider="google" hidden>Продолжить через Google</button>
+      <button type="button" class="btn alt" id="accountPasskey" aria-describedby="accountPasskeyHint" hidden>Войти ключом или по QR</button>
+      <p class="muted auth-hint" id="accountPasskeyHint" hidden>Если ключ уже добавлен, выберите вход с другого телефона, чтобы браузер показал QR-код.</p>
     </div>
-    <form class="account-form" id="accountEmailForm" method="post">
-      <label for="accountEmail">Электронная почта</label>
-      <input id="accountEmail" type="email" placeholder="you@example.com" autocomplete="email" maxlength="254" required>
-      <button id="accountEmailButton" type="submit" class="btn">Получить код</button>
-    </form>
-    <form class="account-form" id="accountCodeForm" method="post" hidden>
-      <label for="accountCode">Код из письма</label>
-      <input id="accountCode" inputmode="numeric" autocomplete="one-time-code" maxlength="10" pattern="[0-9]{6,10}" required>
-      <button id="accountCodeButton" type="submit" class="btn">Подтвердить код</button>
-      <button id="accountChangeEmail" class="text-button" type="button">Изменить почту или запросить новый код</button>
-    </form>
+    <details class="account-email-option" id="accountEmailOption" open>
+      <summary>Вход по коду на почту</summary>
+      <div class="account-modes" id="accountModes" role="group" aria-label="Вход или регистрация">
+        <button type="button" data-account-mode="login" aria-pressed="true">Войти</button>
+        <button type="button" data-account-mode="register" aria-pressed="false">Создать аккаунт</button>
+      </div>
+      <form class="account-form" id="accountEmailForm" method="post">
+        <label for="accountEmail">Электронная почта</label>
+        <input id="accountEmail" type="email" placeholder="you@example.com" autocomplete="email" maxlength="254" required>
+        <button id="accountEmailButton" type="submit" class="btn">Получить код</button>
+      </form>
+      <form class="account-form" id="accountCodeForm" method="post" hidden>
+        <label for="accountCode">Код из письма</label>
+        <input id="accountCode" inputmode="numeric" autocomplete="one-time-code" maxlength="10" pattern="[0-9]{6,10}" required>
+        <button id="accountCodeButton" type="submit" class="btn">Подтвердить код</button>
+        <p class="muted auth-hint">Если вместо кода пришла ссылка, скопируйте её адрес и откройте в этой вкладке.</p>
+        <button id="accountChangeEmail" class="text-button" type="button">Изменить почту или запросить новый код</button>
+      </form>
+    </details>
   </div>
   <div id="accountMember" hidden>
     <p class="account-email" id="accountMemberEmail"></p>
+    <div class="account-key-actions" id="accountKeyActions" hidden>
+      <button type="button" class="btn alt" id="accountAddPasskey" aria-describedby="accountAddPasskeyHint">Добавить ключ входа</button>
+      <p class="muted auth-hint" id="accountAddPasskeyHint">Используйте ключ для повторного входа с этого устройства или по QR с телефона.</p>
+    </div>
     <div class="quick-info-footer">
       <button type="button" class="btn" data-window-search>Найти запчасть или услугу</button>
       <a class="btn alt" href="#order" data-focus>Описать задачу</a>
@@ -1534,16 +1554,26 @@ $('#catalogCart').onclick = () => {
   quickDialog($('#cartDialog'));
 };
 
-const accountSettings = {url: 'https://qlggbdzodqagtxqifslg.supabase.co', publishableKey: 'sb_publishable_xmpxNkuvDizZoYOl12CJCw_lM-h9kSW'};
+const accountSettings = {
+  url: 'https://qlggbdzodqagtxqifslg.supabase.co',
+  publishableKey: 'sb_publishable_xmpxNkuvDizZoYOl12CJCw_lM-h9kSW',
+  redirectTo: 'https://alexanderkadukov-sys.github.io/kadukov-tech/',
+  providers: {google: false, 'custom:telegram': false}
+};
+const accountSessionKey = 'kadukov-customer-session-v1';
+const accountRedirectKey = 'kadukov-customer-redirect-v1';
+const accountReturnURL = new URL(location.href);
+const accountCallback = accountReturnURL.origin + accountReturnURL.pathname === accountSettings.redirectTo &&
+  ['code', 'error', 'error_description'].some(param => accountReturnURL.searchParams.has(param));
+let accountStorage;
+try { accountStorage = window.sessionStorage; } catch {}
 
 function makeAccountClient(settings) {
   if (!window.supabase?.createClient || !/^https:\/\/[a-z0-9]{20}\.supabase\.co$/.test(settings.url) ||
       !/^sb_publishable_[A-Za-z0-9_-]{12,}$/.test(settings.publishableKey)) return null;
-  let storage;
-  try { storage = window.sessionStorage; } catch {}
   return window.supabase.createClient(settings.url, settings.publishableKey, {
-    auth: {storage, persistSession: Boolean(storage), storageKey: 'kadukov-customer-session-v1',
-      autoRefreshToken: true, detectSessionInUrl: false},
+    auth: {storage: accountStorage, persistSession: Boolean(accountStorage), storageKey: accountSessionKey,
+      autoRefreshToken: true, detectSessionInUrl: false, flowType: 'pkce', experimental: {passkey: true}},
     global: {fetch: (url, options) => fetch(url, {...options, signal: AbortSignal.timeout?.(12000)})}
   }).auth;
 }
@@ -1554,7 +1584,12 @@ const accountEmail = $('#accountEmail');
 const accountCode = $('#accountCode');
 const accountStatus = $('#accountStatus');
 const accountModes = $$('#accountModes button');
-const accountGuestControls = [...accountModes, ...accountEmailForm.elements, ...accountCodeForm.elements];
+const accountProviderButtons = $$('[data-account-provider]');
+const accountPasskey = $('#accountPasskey');
+const accountAddPasskey = $('#accountAddPasskey');
+const accountSignOut = $('#accountSignOut');
+const accountControls = [...accountProviderButtons, accountPasskey, accountAddPasskey, accountSignOut,
+  ...accountModes, ...accountEmailForm.elements, ...accountCodeForm.elements];
 const previewCode = '246810';
 const accountPreviewSession = 'kadukov-account-preview-v1';
 const accountPreview = location.protocol === 'file:' || ['127.0.0.1', 'localhost', '[::1]'].includes(location.hostname);
@@ -1562,7 +1597,7 @@ let accountClient;
 let accountMode = 'login';
 let pendingEmail = '';
 let accountOperation;
-let liveEmail = '';
+let liveAccount = '';
 
 $('#accountGuest').hidden = !accountPreview;
 $('#accountPreviewNote').hidden = !accountPreview;
@@ -1579,12 +1614,12 @@ function resetAccountCode() {
   accountCodeForm.hidden = true;
   accountStatus.textContent = '';
 }
-function renderAccount(email) {
-  $('#accountGuest').hidden = Boolean(email);
-  $('#accountMember').hidden = !email;
-  $('#accountLabel').textContent = email ? 'Кабинет' : 'Войти';
-  $('#accountMemberEmail').textContent = email || '';
-  $('#accountTitle').textContent = email && accountPreview ? 'Тестовый кабинет' : 'Личный кабинет';
+function renderAccount(member) {
+  $('#accountGuest').hidden = Boolean(member);
+  $('#accountMember').hidden = !member;
+  $('#accountLabel').textContent = member ? 'Кабинет' : 'Войти';
+  $('#accountMemberEmail').textContent = member;
+  $('#accountTitle').textContent = member && accountPreview ? 'Тестовый кабинет' : 'Личный кабинет';
   resetAccountCode();
 }
 function updatePreviewSession(member) {
@@ -1595,8 +1630,7 @@ function updatePreviewSession(member) {
   renderAccount(member ? accountEmail.value : '');
 }
 function accountBusy(busy) {
-  accountGuestControls.forEach(control => { control.disabled = busy; });
-  $('#accountSignOut').disabled = busy;
+  accountControls.forEach(control => { control.disabled = busy; });
 }
 async function runAccountAction(action, onFailure) {
   if (accountOperation) return;
@@ -1612,11 +1646,36 @@ async function runAccountAction(action, onFailure) {
   }
 }
 function syncLiveAccount(session) {
-  const email = session?.user?.is_anonymous ? '' : (session?.user?.email || '');
-  if (email === liveEmail) return;
-  liveEmail = email;
-  renderAccount(email);
+  const user = session?.user;
+  const name = user?.user_metadata?.name;
+  const member = user?.id && !user.is_anonymous
+    ? user.email || (typeof name === 'string' && name.trim().slice(0, 100)) || 'Вход подтверждён'
+    : '';
+  if (member === liveAccount) return;
+  liveAccount = member;
+  renderAccount(member);
 }
+
+async function finishAccountRedirect() {
+  history.replaceState(history.state, '', accountReturnURL.pathname + '?view=account');
+  const code = accountReturnURL.searchParams.get('code');
+  accountStatus.textContent = 'Завершаем вход…';
+  await runAccountAction(async () => {
+    const [method, startedAt] = (accountStorage?.getItem(accountRedirectKey) || '').split(':');
+    accountStorage?.removeItem(accountRedirectKey);
+    const age = Date.now() - Number(startedAt);
+    const maxAge = (method === 'email' ? 60 : 15) * 60 * 1000;
+    if (!code || !Number.isFinite(age) || age < 0 || age > maxAge) throw new Error('Inactive sign-in');
+    const {data, error} = await accountClient.exchangeCodeForSession(code);
+    if (error || !data.session) throw new Error('No session returned');
+    syncLiveAccount(data.session);
+    accountStatus.textContent = '';
+    if (accountDialog.open) $('#accountTitle').focus();
+  }, () => {
+    accountStatus.textContent = 'Вход не завершён. Попробуйте снова в этой вкладке или войдите по коду на почту.';
+  });
+}
+
 if (!accountPreview) {
   document.addEventListener('DOMContentLoaded', () => {
     accountClient = makeAccountClient(accountSettings);
@@ -1624,15 +1683,77 @@ if (!accountPreview) {
       accountStatus.textContent = 'Вход временно недоступен. Обратитесь к мастеру через раздел «Контакты».';
       return;
     }
+    const supportsPasskeys = window.isSecureContext && window.PublicKeyCredential && navigator.credentials &&
+      typeof accountClient.signInWithPasskey === 'function';
+    for (const button of accountProviderButtons) {
+      button.hidden = !accountSettings.providers[button.dataset.accountProvider];
+    }
+    const hasSocialLogin = accountProviderButtons.some(button => !button.hidden);
+    $('#accountOptions').hidden = !hasSocialLogin && !supportsPasskeys;
+    $('#accountEmailOption').open = !hasSocialLogin;
+    accountPasskey.hidden = !supportsPasskeys;
+    $('#accountPasskeyHint').hidden = !supportsPasskeys;
+    $('#accountKeyActions').hidden = !supportsPasskeys || typeof accountClient.registerPasskey !== 'function';
     accountClient.onAuthStateChange((event, session) => {
       if (event === 'INITIAL_SESSION' && !session) {
-        accountStatus.textContent = '';
+        if (!accountCallback) accountStatus.textContent = '';
         $('#accountGuest').hidden = false;
       }
       syncLiveAccount(session);
     });
+    if (accountCallback) void finishAccountRedirect();
   }, {once: true});
 }
+
+for (const button of accountProviderButtons) {
+  button.addEventListener('click', async () => {
+    const provider = button.dataset.accountProvider;
+    if (!accountClient || !accountSettings.providers[provider] || accountOperation) return;
+    accountStatus.textContent = 'Открываем страницу входа…';
+    await runAccountAction(async () => {
+      if (!accountStorage) throw new Error('Session storage unavailable');
+      accountStorage.setItem(accountRedirectKey, 'social:' + Date.now());
+      try {
+        const {data, error} = await accountClient.signInWithOAuth({
+          provider, options: {redirectTo: accountSettings.redirectTo, skipBrowserRedirect: true}
+        });
+        if (error || !data.url) throw new Error('No sign-in URL returned');
+        location.assign(data.url);
+      } catch (error) {
+        accountStorage.removeItem(accountRedirectKey);
+        throw error;
+      }
+    }, () => {
+      accountStatus.textContent = 'Не удалось открыть страницу входа. Попробуйте снова или войдите по коду на почту.';
+    });
+  });
+}
+
+accountPasskey.addEventListener('click', async () => {
+  if (accountPasskey.hidden || !accountClient || accountOperation) return;
+  accountStatus.textContent = 'Выберите сохранённый ключ или другое устройство.';
+  await runAccountAction(async () => {
+    const {data, error} = await accountClient.signInWithPasskey();
+    if (error || !data.session) throw new Error('No passkey session returned');
+    syncLiveAccount(data.session);
+    if (accountDialog.open) $('#accountTitle').focus();
+  }, () => {
+    accountStatus.textContent = 'Вход по ключу не завершён. Если у вас ещё нет ключа, добавьте его после входа другим способом.';
+  });
+});
+
+accountAddPasskey.addEventListener('click', async () => {
+  if (!liveAccount || accountOperation) return;
+  accountStatus.textContent = 'Подтвердите создание ключа на своём устройстве.';
+  await runAccountAction(async () => {
+    const {error} = await accountClient.registerPasskey();
+    if (error) throw error;
+    accountStatus.textContent = 'Ключ добавлен. Его можно использовать при следующем входе.';
+  }, () => {
+    accountStatus.textContent = 'Не удалось добавить ключ. Проверьте настройки устройства или войдите заново.';
+  });
+});
+
 for (const mode of accountModes) {
   mode.addEventListener('click', () => {
     accountMode = mode.dataset.accountMode;
@@ -1657,9 +1778,10 @@ accountEmailForm.addEventListener('submit', async event => {
     accountStatus.textContent = 'Запрашиваем код…';
     await runAccountAction(async () => {
       const {error} = await accountClient.signInWithOtp({
-        email, options: {shouldCreateUser: accountMode === 'register'}
+        email, options: {shouldCreateUser: accountMode === 'register', emailRedirectTo: accountSettings.redirectTo}
       });
       if (error) throw error;
+      try { accountStorage?.setItem(accountRedirectKey, 'email:' + Date.now()); } catch {}
       if (accountDialog.open) requestCodeStep(email);
     }, error => {
       accountStatus.textContent = error.status === 429
@@ -1688,6 +1810,7 @@ accountCodeForm.addEventListener('submit', async event => {
       });
       if (error) throw error;
       if (!data.session || !data.user?.email || data.user.is_anonymous) throw new Error('Incomplete session');
+      try { accountStorage?.removeItem(accountRedirectKey); } catch {}
       syncLiveAccount(data.session);
       if (accountDialog.open) $('#accountTitle').focus();
     }, error => {
@@ -1704,12 +1827,13 @@ $('#accountChangeEmail').addEventListener('click', () => {
   resetAccountCode();
   accountEmail.focus();
 });
-$('#accountSignOut').addEventListener('click', async () => {
+accountSignOut.addEventListener('click', async () => {
   if (accountPreview) updatePreviewSession(false);
-  else if (accountClient && liveEmail) {
+  else if (accountClient && liveAccount) {
     await runAccountAction(async () => {
       const {error} = await accountClient.signOut({scope: 'local'});
       if (error) throw error;
+      try { accountStorage?.removeItem(accountRedirectKey); } catch {}
       syncLiveAccount(null);
     }, () => {
       accountStatus.textContent = 'Не удалось выйти. Проверьте подключение и повторите.';
@@ -1732,7 +1856,7 @@ if (priceParam === '1' || priceEntries.some(product => product.id === priceParam
   openQuickInfo(priceParam === '1' ? 'prices' : priceParam);
 } else if (previewParams.get('view') === 'map') {
   quickDialog(siteMapDialog);
-} else if (previewParams.get('view') === 'account') {
+} else if (previewParams.get('view') === 'account' || accountCallback) {
   quickDialog(accountDialog);
 }
 </script><script>
