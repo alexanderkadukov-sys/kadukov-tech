@@ -333,6 +333,33 @@ body .price-list .quick-price-heading { display:grid; justify-content:start; }
   body #quickHome #serviceStrip .quick-service::before { aspect-ratio:2.6; }
   body #quickHome #serviceStrip .service-label { font-size:1rem; }
 }
+@media (min-width:1200px) {
+  body { --desktop-gutter:clamp(24px, 2.5vw, 50px); }
+  body .wrap { width:min(2080px, calc(100% - 2 * var(--desktop-gutter))); }
+  body > header .quick-results { max-width:780px; }
+  body #quickHome .hub-grid { grid-template-columns:1.2fr minmax(0, 1fr); }
+  body #quickHome .hub-grid > section { min-height:clamp(395px, 28vw, 500px); }
+  body #quickHome .hub-shop { padding:clamp(32px, 3.5vw, 72px); }
+  #quickHome .hub-workshop-copy { padding:clamp(30px, 3.5vw, 72px); }
+  .service-page-wrap, .service-view .ordergrid { max-width:1560px; }
+  body #order.workshop-request .ordergrid {
+    grid-template-columns:minmax(230px, .6fr) minmax(0, 1.4fr);
+    gap:clamp(30px, 4vw, 72px); max-width:1560px;
+  }
+  #order.workshop-request .orderbox p { max-width:38ch; }
+  :is(#serviceDialog, #siteMapDialog, #quickCatalogDialog, #quickInfoDialog.price-sheet) .workspace-content {
+    max-width:1700px; padding-inline:clamp(24px, 3vw, 46px);
+  }
+  .workspace-content .site-map { grid-template-columns:repeat(auto-fit,minmax(min(100%, 225px),1fr)); }
+  #priceFilter { max-width:620px; }
+}
+@media (min-width:1600px) {
+  body #quickHome #serviceStrip { grid-template-columns:repeat(8,minmax(0,1fr)); }
+  body #quickHome #serviceStrip .quick-service::before { aspect-ratio:2; }
+  #servicePage .service-options, #serviceDialog .service-options {
+    grid-template-columns:repeat(auto-fit,minmax(min(100%, 225px),1fr));
+  }
+}
 @media (max-width:700px) {
   body #quickHome .hub-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); padding:0; border:0; }
   body #quickHome .hub-grid > section { display:block; min-height:132px; padding:0; border-radius:15px; overflow:hidden; color:white; background:#142d3a; }
@@ -1695,6 +1722,7 @@ function openQuickInfo(key) {
   const product = priceEntries.find(value => value.id === key);
   const topic = topics.find(value => value.key === key);
   const isPriceList = key === 'prices';
+  quickInfoDialog.classList.toggle('price-sheet', isPriceList);
   $('#quickInfoTitle').textContent = isPriceList ? 'Проверенные цены' : product?.name || topic?.title || 'Быстрая информация';
   $('#quickInfoIndex').hidden = Boolean(topic || product);
   $('#priceFilter').hidden = !isPriceList;
