@@ -171,9 +171,8 @@ body #accountDialog .account-form button.btn { min-height:46px; }
   body #accountDialog > header { position:static; min-height:44px; padding:0 0 8px; }
 }
 </style><style>
-#workspaceHome[hidden], .workspace-rail[hidden] { display:none; }
-#workspaceHome { display:flex; flex-wrap:wrap; gap:8px; padding-block:10px; }
-#workspaceHome .workspace-right { margin-left:auto; }
+#workspaceHome[hidden], .workspace-rail[hidden], .workspace-search[hidden] { display:none; }
+#workspaceHome { display:flex; padding-block:10px; scroll-margin-top:76px; }
 body dialog.quick-dialog:is(.workspace-dialog, #quickInfoDialog, #accountDialog)[open] {
   --window-nav:#112431; --window-text:#edf8fa; --window-accent:#74f4d7;
   box-sizing:border-box; display:flex; flex-direction:column; position:fixed; inset:0;
@@ -184,7 +183,7 @@ body dialog.quick-dialog:is(.workspace-dialog, #quickInfoDialog, #accountDialog)
   box-shadow:inset 0 0 13px #74f4d725;
 }
 .workspace-toolbar {
-  position:relative; z-index:1; display:flex; flex-wrap:wrap; align-items:center;
+  position:relative; z-index:2; display:flex; flex-wrap:wrap; align-items:center;
   gap:8px; padding:7px clamp(9px, 2vw, 24px); border-bottom:1px solid #74f4d755;
   color:var(--window-text); background:var(--window-nav);
 }
@@ -198,17 +197,21 @@ body dialog.quick-dialog:is(.workspace-dialog, #quickInfoDialog, #accountDialog)
 .workspace-toolbar summary { list-style:none; gap:8px; }
 .workspace-toolbar summary::-webkit-details-marker { display:none; }
 .workspace-toolbar summary::after { content:'▾'; }
-.workspace-picker {
-  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; position:absolute;
+.workspace-picker, .workspace-search {
+  position:absolute;
   left:clamp(9px, 2vw, 24px); top:100%; z-index:1; width:min(460px, calc(100% - 18px));
   max-height:calc(100dvh - 80px); padding:8px; overflow:auto;
   color:var(--window-text); background:var(--window-nav); border:1px solid #43736f;
   border-radius:0 0 10px 10px; box-shadow:0 10px 22px #08192345;
 }
-.workspace-stage { display:flex; flex:1; min-height:0; min-width:0; overflow:hidden; }
+.workspace-picker { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+.workspace-search { width:min(640px, calc(100% - 18px)); }
+.workspace-search .quick-search { width:100%; margin:0; }
+.workspace-search .quick-results { position:static; max-height:min(400px, 43dvh); margin-top:6px; }
+.workspace-stage { display:flex; flex:1; min-height:0; min-width:0; overflow:hidden; isolation:isolate; }
 .workspace-panel { display:flex; flex:1; min-width:0; min-height:0; flex-direction:column; background:var(--surface); }
 .workspace-panel > header {
-  display:flex; align-items:center; justify-content:space-between; flex:none;
+  display:flex; align-items:center; justify-content:space-between; flex:none; z-index:auto;
   min-height:58px; gap:8px; padding:6px clamp(9px, 2vw, 24px); border-bottom:1px solid var(--line);
   touch-action:pan-y; cursor:grab; user-select:none;
 }
@@ -220,7 +223,12 @@ body .workspace-panel .window-tools .square { display:grid; place-items:center; 
   flex:1; min-height:0; min-width:0; width:100%; max-width:1000px; align-self:center;
   padding:clamp(12px, 3vw, 26px); overflow:auto; overscroll-behavior:contain;
 }
-.workspace-rail { display:flex; flex-wrap:wrap; gap:6px; }
+.workspace-stage > .workspace-dock { display:contents; }
+.workspace-rail { display:flex; flex-wrap:wrap; gap:6px; min-width:0; }
+#workspaceHome .workspace-dock { display:flex; gap:8px; width:100%; }
+#workspaceHome .workspace-right { margin-left:auto; }
+.workspace-stage .workspace-left { order:-1; }
+.workspace-stage .workspace-right { order:1; }
 .workspace-stage .workspace-rail {
   flex:0 0 clamp(120px, 14vw, 185px); flex-flow:column nowrap; padding:8px; overflow:auto;
   background:var(--window-nav); scrollbar-width:thin;
@@ -229,16 +237,20 @@ body .workspace-panel .window-tools .square { display:grid; place-items:center; 
 #storefrontDialog .workspace-content { max-width:none; padding:0; overflow:hidden; }
 #workspaceCatalog { display:block; width:100%; height:100%; border:0; }
 @media (max-width:760px) {
-  .workspace-stage { display:grid; grid-template-rows:minmax(0,1fr) auto; grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .workspace-panel { grid-area:1 / 1 / 2 / -1; }
-  .workspace-stage .workspace-left { grid-area:2 / 1; }
-  .workspace-stage .workspace-right { grid-area:2 / 2; }
-  .workspace-stage:has(> .workspace-rail[hidden]) > .workspace-rail { grid-column:1 / -1; }
-  .workspace-stage .workspace-rail {
-    flex-flow:row wrap; align-content:flex-start; max-height:min(104px, 23dvh);
-    border-top:1px solid #74f4d755; padding:5px;
+  .workspace-stage { flex-direction:column; }
+  .workspace-stage > .workspace-dock, #workspaceHome .workspace-dock {
+    display:flex; flex:none; align-items:center; gap:8px; min-width:0;
+    overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:thin;
   }
-  .workspace-stage .workspace-rail button { width:auto; max-width:100%; min-height:40px; }
+  .workspace-stage > .workspace-dock {
+    border-top:1px solid #74f4d755; padding:5px 8px; background:var(--window-nav);
+  }
+  .workspace-stage > .workspace-dock[hidden] { display:none; }
+  .workspace-dock .workspace-rail { flex:0 0 auto; flex-flow:row nowrap; overflow:visible; padding:0; }
+  .workspace-dock .workspace-rail button {
+    display:block; width:auto; max-width:min(67vw, 250px); min-height:40px;
+    overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+  }
   #workspaceHome .workspace-right { margin-left:0; }
 }
 @media (max-width:450px) {
@@ -1065,6 +1077,8 @@ if (pageKey) {
 if('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches){let observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}}),{threshold:.08});document.body.classList.add('reveal-ready');$$('.sectionhead,.service,.catalog-card,.aboutgrid,.ordergrid').forEach(el=>{el.classList.add('reveal');observer.observe(el)})}
 
 const quickSearch = $('#quickSearch');
+const quickSearchHome = quickSearch.parentElement;
+const quickSearchAnchor = quickSearch.nextElementSibling;
 const quickQuery = $('#quickQuery');
 const quickResults = $('#quickResults');
 const quickStatus = $('#quickStatus');
@@ -1106,13 +1120,43 @@ workspacePickerToggle.textContent = 'Открыть раздел';
 const workspacePickerItems = document.createElement('div');
 workspacePickerItems.className = 'workspace-picker';
 workspacePicker.append(workspacePickerToggle, workspacePickerItems);
-workspaceToolbar.append(workspaceButton(document.body.classList.contains('service-view') ? '← К странице' : '← Главная', () => leaveWindow()), workspacePicker);
+const workspaceSearch = document.createElement('div');
+workspaceSearch.className = 'workspace-search';
+workspaceSearch.id = 'workspaceSearch';
+workspaceSearch.hidden = true;
+let workspaceSearchOpener;
+workspaceToolbar.append(workspaceButton(document.body.classList.contains('service-view') ? '← К странице' : '← Главная', () => leaveWindow()), workspacePicker, workspaceSearch);
 const workspaceRails = Object.fromEntries(['left', 'right'].map((side, index) => {
   const rail = document.createElement('nav');
   rail.className = 'workspace-rail workspace-' + side;
   rail.setAttribute('aria-label', index === 0 ? 'Окна слева' : 'Окна справа');
   return [side, rail];
 }));
+const workspaceDock = document.createElement('div');
+workspaceDock.className = 'workspace-dock';
+workspaceDock.append(...Object.values(workspaceRails));
+
+function closeWorkspaceSearch(restoreFocus = false) {
+  if (workspaceSearch.hidden) return;
+  closeQuickSearch();
+  quickSearchHome.insertBefore(quickSearch, quickSearchAnchor);
+  workspaceSearch.hidden = true;
+  workspaceSearchOpener.setAttribute('aria-expanded', 'false');
+  if (restoreFocus) workspaceSearchOpener.focus({preventScroll: true});
+}
+
+function openWorkspaceSearch(opener) {
+  if (!workspaceSearch.hidden) {
+    closeWorkspaceSearch(true);
+    return;
+  }
+  workspaceSearchOpener = opener;
+  workspacePicker.open = false;
+  workspaceSearch.hidden = false;
+  workspaceSearch.append(quickSearch);
+  opener.setAttribute('aria-expanded', 'true');
+  quickQuery.focus({preventScroll: true});
+}
 
 function renderWorkspace() {
   const stage = activeWindow?.dialog.querySelector('.workspace-stage');
@@ -1125,9 +1169,9 @@ function renderWorkspace() {
     });
     rail.replaceChildren(...buttons);
     rail.hidden = !buttons.length;
-    if (stage && side === 'left') stage.prepend(rail);
-    else (stage || workspaceHome).append(rail);
   }
+  workspaceDock.hidden = !tabs.length;
+  (stage || workspaceHome).append(workspaceDock);
   workspaceHome.hidden = Boolean(stage) || !tabs.length;
 }
 
@@ -1140,19 +1184,24 @@ function leaveWindow(side, discard = false, focusHome = true) {
   if (discard) workspaceTabs.delete(tab.key);
   activeWindow = null;
   workspacePicker.open = false;
+  closeWorkspaceSearch();
   tab.dialog.close();
   if (focusHome) {
     renderWorkspace();
     const restored = discard ? tab.opener : [...workspaceHome.querySelectorAll('button')].find(button =>
       button.dataset.windowKey === tab.key);
-    (restored?.getClientRects().length ? restored : quickQuery).focus({preventScroll: true});
-    if (scrollY !== top) window.scrollTo({top, behavior: 'instant'});
+    const focusTarget = restored?.getClientRects().length ? restored : $('[data-site-view="map"]');
+    focusTarget.focus({preventScroll: true});
+    closeQuickSearch();
+    if (!discard) workspaceHome.scrollIntoView({block: 'nearest', behavior: 'instant'});
+    else if (scrollY !== top) window.scrollTo({top, behavior: 'instant'});
   }
 }
 
 function quickDialog(dialog, {key = dialog.id, restore = () => quickDialog(dialog)} = {}) {
   const top = scrollY;
   const opener = document.activeElement;
+  closeWorkspaceSearch();
   closeQuickSearch();
   workspacePicker.open = false;
   const heading = dialog.querySelector('h2');
@@ -1302,6 +1351,8 @@ for (const dialog of quickDialogs) {
   search.className = 'square';
   search.dataset.windowSearch = '';
   search.setAttribute('aria-label', 'Поиск по сайту');
+  search.setAttribute('aria-controls', 'workspaceSearch');
+  search.setAttribute('aria-expanded', 'false');
   search.innerHTML = ico('searchIcon');
   close.before(controls);
   const left = workspaceButton('←', () => leaveWindow('left'), 'Сдвинуть окно влево');
@@ -1311,13 +1362,15 @@ for (const dialog of quickDialogs) {
   close.onclick = () => leaveWindow(null, true);
   dialog.addEventListener('cancel', event => {
     event.preventDefault();
-    if (workspacePicker.open) {
+    if (!workspaceSearch.hidden) closeWorkspaceSearch(true);
+    else if (workspacePicker.open) {
       workspacePicker.open = false;
       workspacePickerToggle.focus();
     } else leaveWindow();
   });
   dialog.addEventListener('click', event => {
     if (!workspacePicker.contains(event.target)) workspacePicker.open = false;
+    if (!workspaceSearch.contains(event.target) && !event.target.closest('[data-window-search]')) closeWorkspaceSearch();
   });
   let drag;
   header.addEventListener('pointerdown', event => {
@@ -1568,7 +1621,7 @@ function openServiceWindow(key) {
 }
 
 workspacePickerItems.append(
-  ...directions.map(({key, label}) => workspaceButton(label, () => openServiceWindow(key))),
+  ...directions.map(({key, label}) => workspaceButton(key === 'foreign-number' ? 'Иностранный номер' : label, () => openServiceWindow(key))),
   workspaceButton('Каталог', () => openStorefront(storefrontFrame.getAttribute('src') || 'catalog/')),
   workspaceButton('Описать задачу', openQuickRequest),
   workspaceButton('Проверенные цены', () => openQuickInfo('prices')),
@@ -1637,9 +1690,7 @@ document.addEventListener('click', event => {
   } else if (control.dataset.siteView) {
     quickDialog(control.dataset.siteView === 'map' ? siteMapDialog : accountDialog);
   } else {
-    leaveWindow();
-    quickQuery.focus();
-    renderQuickResults();
+    openWorkspaceSearch(control);
   }
 });
 const actionQueries = {
@@ -1903,6 +1954,11 @@ quickSearch.addEventListener('submit', event => {
   quickResults.querySelector('.quick-result')?.click();
 });
 quickSearch.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !workspaceSearch.hidden) {
+    event.preventDefault();
+    closeWorkspaceSearch(true);
+    return;
+  }
   if (event.key === 'Escape' && (!quickResults.hidden || recognizer || quickStatus.textContent)) {
     event.preventDefault();
     quickQuery.focus();
