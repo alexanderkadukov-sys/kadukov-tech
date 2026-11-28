@@ -107,6 +107,10 @@ body{--bg:#f9fafb;--surface:#fff;--ink:#17222e;--muted:#5e6b79;--line:#dfe5eb;--
 .quick-dialog:focus{outline:0}
 .quick-dialog #request,.quick-dialog #catalog{margin:0;padding:0;border:0;box-shadow:none}
 .quick-dialog [hidden]{display:none}
+.foreign-number-entry{margin:12px 0 0}
+.foreign-number-entry .btn{min-height:42px}
+#foreignNumberRequest,#foreignNumberReview{margin:0;padding:0;border:0;box-shadow:none}
+#foreignNumberReview textarea{min-height:130px}
 .quick-info-topic{display:block;width:100%;padding:8px 10px;text-align:left;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:14px}
 .quick-info-topic:hover{background:var(--soft)}
 .quick-info-index{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
@@ -206,6 +210,7 @@ body #accountDialog .account-form button.btn { min-height:46px; }
       <a class="hub-action" href="?service=repair" data-page="phone">Обсудить ремонт <span aria-hidden="true">→</span></a></div>
     </section>
   </div>
+  <div class="foreign-number-entry"><a class="btn alt" data-page="foreign-number" href="?service=foreign-number">Подключение сервиса с иностранным номером</a></div>
   <div class="directions-heading"><h2>Услуги мастерской</h2><a href="?price=1" data-quick-info="prices">Проверенные цены</a><button type="button" id="stripToggle" aria-controls="serviceStrip">Пауза</button></div>
   <nav class="quick-directions" aria-label="Направления">
     <div class="primary-services" id="serviceStrip">
@@ -334,6 +339,55 @@ body #accountDialog .account-form button.btn { min-height:46px; }
   <header><h2 id="serviceDialogTitle" tabindex="-1"></h2><button type="button" class="square" data-close-quick aria-label="Закрыть">×</button></header>
   <p id="serviceDialogIntro" class="window-intro"></p>
   <div id="serviceDialogOptions" class="service-options"></div>
+</dialog>
+<dialog class="modal quick-dialog" id="foreignNumberDialog" aria-labelledby="foreignNumberTitle">
+  <header><h2 id="foreignNumberTitle" tabindex="-1">Подключение сервиса с иностранным номером</h2><button type="button" class="square" data-close-quick aria-label="Закрыть">×</button></header>
+  <p class="window-intro" id="foreignNumberIntro">Проверим требования сервиса и подскажем, подойдёт ли ваш номер. Если нужен новый, пришлём варианты SIM или eSIM с номером нужной страны и поможем с подключением. Стоимость согласуем до оплаты.</p>
+  <form class="formgrid" id="foreignNumberRequest">
+    <label class="field"><span class="field-title">Сервис</span>
+      <select name="platform" required>
+        <option value="" disabled selected>Выберите сервис</option>
+        <option>OpenAI / ChatGPT</option><option>WhatsApp Business</option><option>WhatsApp</option>
+        <option>Amazon</option><option>Apple</option><option>Discord</option><option>Facebook</option>
+        <option>Google</option><option>Instagram</option><option>Microsoft</option><option>Outlook</option>
+        <option>Snapchat</option><option>Telegram</option><option value="other">Другой сервис</option>
+      </select>
+    </label>
+    <label class="field"><span class="field-title">Страна номера</span>
+      <select name="country" required>
+        <option value="" disabled selected>Выберите страну</option>
+        <option>Великобритания</option><option>Германия</option><option>США</option>
+        <option>Не знаю, нужна помощь</option><option value="other">Другая страна</option>
+      </select>
+    </label>
+    <label class="field" hidden><span class="field-title">Название сервиса</span><input name="otherPlatform" maxlength="80" disabled></label>
+    <label class="field" hidden><span class="field-title">Название страны</span><input name="otherCountry" maxlength="60" disabled></label>
+    <label class="field"><span class="field-title">Способ подтверждения в сервисе</span>
+      <select name="channel"><option>Нужно уточнить</option><option>SMS</option><option>WhatsApp</option></select>
+    </label>
+    <label class="field"><span class="field-title">У вас уже есть SIM или eSIM?</span>
+      <select name="sim" required>
+        <option value="" disabled selected>Выберите вариант</option>
+        <option>Да, номер мой</option><option>Нет, нужна помощь с подбором</option>
+      </select>
+    </label>
+    <label class="field full"><span class="field-title">Что нужно настроить?</span>
+      <textarea name="details" maxlength="400" rows="2" placeholder="Например, хочу настроить рабочий аккаунт"></textarea>
+      <span class="field-hint">Необязательно. Не указывайте пароли и коды подтверждения.</span>
+    </label>
+    <p class="note full">Код придёт на ваш номер. Вы введёте его самостоятельно в самом сервисе.</p>
+    <div class="request-buttons full"><button class="btn" type="submit">Подготовить заявку</button></div>
+  </form>
+  <section class="formgrid" id="foreignNumberReview" aria-label="Черновик заявки" hidden>
+    <label class="field full"><span class="field-title">Черновик заявки</span><textarea id="foreignNumberDraft" rows="5" readonly></textarea></label>
+    <div class="request-buttons full">
+      <button type="button" class="btn" id="sendForeignNumberRequest">Открыть Telegram</button>
+      <button type="button" class="btn alt" id="copyForeignNumberRequest">Скопировать</button>
+      <button type="button" class="btn alt" id="editForeignNumberRequest">Изменить</button>
+    </div>
+    <p class="note full">Проверьте черновик и нажмите «Отправить» в Telegram. Мастер уточнит условия подключения и стоимость.</p>
+    <p class="request-status full" id="foreignNumberStatus" role="status"></p>
+  </section>
 </dialog>
 <dialog class="modal quick-dialog" id="accountDialog" aria-labelledby="accountTitle">
   <header><h2 id="accountTitle" tabindex="-1">Личный кабинет</h2><button type="button" class="square" data-close-quick aria-label="Закрыть">×</button></header>
@@ -475,7 +529,8 @@ const phoneInput = $('#tel');
 const includeItems = $('#includeItems');
 const requestStatus = $('#requestStatus');
 const serviceParam = new URLSearchParams(location.search).get('service');
-const pageKey = $$('#quickHome [data-page]').find(link => link.getAttribute('href') === '?service=' + serviceParam)?.dataset.page;
+const pageKey = serviceParam === 'foreign-number' ? undefined :
+  $$('#quickHome [data-page]').find(link => link.getAttribute('href') === '?service=' + serviceParam)?.dataset.page;
 const draftKey = pageKey ? 'kadukov-request-draft-v1-' + pageKey : 'kadukov-request-draft-v1';
 const contexts = Object.create(null);
 const allItems = new Set(Object.values(data).flat().map(row => row[0]));
@@ -740,14 +795,18 @@ function prepareRequest() {
   ].filter(Boolean).join('\n');
 }
 
+function openTelegramDraft(text) {
+  const url = new URL('https://t.me/Kaduk0v');
+  url.searchParams.set('text', text);
+  if (!openInTelegramApp('openTelegramLink', url.href)) window.open(url.href, '_blank', 'noopener,noreferrer');
+}
+
 request.addEventListener('submit', event => {
   event.preventDefault();
   const text = prepareRequest();
   if (!text) return;
   saveDraft();
-  const url = new URL('https://t.me/Kaduk0v');
-  url.searchParams.set('text', text);
-  if (!openInTelegramApp('openTelegramLink', url.href)) window.open(url.href, '_blank', 'noopener,noreferrer');
+  openTelegramDraft(text);
   requestStatus.textContent = 'Черновик подготовлен. Для отправки нажмите «Отправить» в Telegram.';
 });
 $('#copyRequest').addEventListener('click', async () => {
@@ -851,8 +910,13 @@ const servicePages = {
       ['Настроить аккаунт', 'Уточним, какой сервис нужно подключить или настроить.'],
       ['Восстановить доступ', 'Подскажу официальные способы восстановления для владельца.'],
       ['Подготовить видео', 'Обсудим монтаж, ролики и формат готового видео.'],
-      ['Оформить материалы', 'Подберём подход к обложке, логотипу или другому материалу.']
+      ['Оформить материалы', 'Подберём подход к обложке, логотипу или другому материалу.'],
+      ['Сервис с иностранным номером', 'Проверим, какой номер подойдёт для регистрации, и поможем с настройкой.', 'foreign-number']
     ]
+  },
+  'foreign-number': {
+    intro: 'Помощь с регистрацией и настройкой сервисов, которые требуют номер другой страны.',
+    actions: []
   }
 };
 
@@ -879,16 +943,21 @@ function openServicePage() {
   if (service.value !== direction || !page.actions.some(([name]) => name === selectedAction)) {
     selectedAction = '';
   }
-  const options = page.actions.map(([name, description]) => {
-    const button = document.createElement('button');
+  const options = page.actions.map(([name, description, linkedService]) => {
+    const button = document.createElement(linkedService ? 'a' : 'button');
     const label = document.createElement('strong');
     const hint = document.createElement('span');
-    button.type = 'button';
     button.className = 'service-option';
-    button.value = name;
     label.textContent = name;
     hint.textContent = description;
     button.append(label, hint);
+    if (linkedService) {
+      button.href = '?service=' + linkedService;
+      button.dataset.page = linkedService;
+      return button;
+    }
+    button.type = 'button';
+    button.value = name;
     button.onclick = () => {
       chooseService(direction);
       selectedAction = name;
@@ -924,8 +993,9 @@ const quickRequestDialog = $('#quickRequestDialog');
 const quickCatalogDialog = $('#quickCatalogDialog');
 const siteMapDialog = $('#siteMapDialog');
 const serviceDialog = $('#serviceDialog');
+const foreignNumberDialog = $('#foreignNumberDialog');
 const accountDialog = $('#accountDialog');
-const quickDialogs = [quickInfoDialog, quickRequestDialog, quickCatalogDialog, siteMapDialog, serviceDialog, accountDialog, $('#cartDialog')];
+const quickDialogs = [quickInfoDialog, quickRequestDialog, quickCatalogDialog, siteMapDialog, serviceDialog, foreignNumberDialog, accountDialog, $('#cartDialog')];
 const requestHome = request.parentElement;
 const catalogPanel = $('#catalog');
 const catalogHome = catalogPanel.parentElement;
@@ -946,6 +1016,66 @@ function openQuickRequest() {
   $('#quickRequestContent').append(request);
   quickDialog(quickRequestDialog, top);
 }
+
+const foreignNumberRequest = $('#foreignNumberRequest');
+const foreignNumberReview = $('#foreignNumberReview');
+const foreignNumberDraft = $('#foreignNumberDraft');
+const foreignNumberStatus = $('#foreignNumberStatus');
+const foreignFields = foreignNumberRequest.elements;
+const foreignChoices = [
+  { select: foreignFields.namedItem('platform'), input: foreignFields.namedItem('otherPlatform') },
+  { select: foreignFields.namedItem('country'), input: foreignFields.namedItem('otherCountry') }
+];
+for (const {select, input} of foreignChoices) {
+  const syncChoice = () => {
+    const custom = select.value === 'other';
+    input.closest('label').hidden = !custom;
+    input.disabled = !custom;
+    input.required = custom;
+    input.setCustomValidity('');
+  };
+  select.addEventListener('change', syncChoice);
+  input.addEventListener('input', () => input.setCustomValidity(''));
+  syncChoice();
+}
+
+foreignNumberRequest.addEventListener('submit', event => {
+  event.preventDefault();
+  for (const {input} of foreignChoices) {
+    if (!input.disabled && !input.value.trim()) input.setCustomValidity('Заполните это поле.');
+  }
+  if (!foreignNumberRequest.reportValidity()) return;
+  const [platform, country] = foreignChoices.map(({select, input}) => input.disabled ? select.value : input.value.trim());
+  const details = foreignFields.namedItem('details').value.trim();
+  foreignNumberDraft.value = [
+    'Здравствуйте! Нужна помощь с подключением сервиса с иностранным номером.',
+    'Сервис — ' + platform,
+    'Страна номера — ' + country,
+    'Способ подтверждения — ' + foreignFields.namedItem('channel').value,
+    'SIM или eSIM — ' + foreignFields.namedItem('sim').value,
+    details ? 'Задача — ' + details : ''
+  ].filter(Boolean).join('\n');
+  foreignNumberStatus.textContent = '';
+  foreignNumberRequest.hidden = true;
+  foreignNumberReview.hidden = false;
+  foreignNumberDraft.focus();
+});
+$('#sendForeignNumberRequest').onclick = () => openTelegramDraft(foreignNumberDraft.value);
+$('#copyForeignNumberRequest').onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(foreignNumberDraft.value);
+    foreignNumberStatus.textContent = 'Черновик скопирован.';
+  } catch {
+    foreignNumberDraft.focus();
+    foreignNumberDraft.select();
+    foreignNumberStatus.textContent = 'Скопируйте выделенный текст.';
+  }
+};
+$('#editForeignNumberRequest').onclick = () => {
+  foreignNumberReview.hidden = true;
+  foreignNumberRequest.hidden = false;
+  foreignChoices[0].select.focus();
+};
 
 function openQuickCatalog(nextMode) {
   const top = scrollY;
@@ -1155,8 +1285,8 @@ document.addEventListener('click', event => {
   if (!quickSearch.contains(event.target)) closeQuickSearch();
 });
 
-const directions = $$('#quickHome .quick-directions [data-page]').map(link => ({
-  key: link.dataset.page, href: link.getAttribute('href'), label: link.querySelector('.service-label').textContent
+const directions = $$('#quickHome .quick-directions [data-page], #quickHome .foreign-number-entry [data-page]').map(link => ({
+  key: link.dataset.page, href: link.getAttribute('href'), label: (link.querySelector('.service-label') || link).textContent
 }));
 const directionQueries = {
   phone: 'починить чинить сломан разбит упал ремонт сервис телефон смартфон iphone samsung ноутбук',
@@ -1165,17 +1295,22 @@ const directionQueries = {
   parts: 'запчасти запчасть деталь компонент экран дисплей аккумулятор шлейф плата',
   chip: 'ии ai искусственный интеллект нейросети chatgpt чатгпт обучение генерация видео изображения чат gpt',
   study: 'учеба реферат курсовая учебный проект презентация оформление доклад',
-  digital: 'цифровые услуги аккаунт монтаж видеомонтаж дизайн логотип подписка контент'
+  digital: 'цифровые услуги аккаунт монтаж видеомонтаж дизайн логотип подписка контент',
+  'foreign-number': 'иностранный зарубежный номер симкарта сим карта sim esim есим смс sms whatsapp ватсап openai chatgpt подтверждение регистрация'
 };
 function openServiceWindow(key) {
+  if (key === 'foreign-number') {
+    quickDialog(foreignNumberDialog);
+    return;
+  }
   const page = servicePages[key];
   const route = directions.find(item => item.key === key);
   $('#serviceDialogTitle').textContent = page.title;
   $('#serviceDialogIntro').textContent = page.intro;
-  const options = page.actions.map(([title, description], index) => {
+  const options = page.actions.map(([title, description, linkedService], index) => {
     const link = document.createElement('a');
     link.className = 'service-option';
-    link.href = route.href + '&action=' + (index + 1);
+    link.href = linkedService ? '?service=' + linkedService : route.href + '&action=' + (index + 1);
     link.dataset.route = '';
     const label = document.createElement('strong');
     label.textContent = title;
@@ -1190,7 +1325,7 @@ function openServiceWindow(key) {
 
 const mapGroups = [
   ['Ремонт и техника', ['phone', 'pc', 'parts', 'shop']],
-  ['Обучение и помощь', ['chip', 'study', 'digital']],
+  ['Обучение и помощь', ['chip', 'study', 'digital', 'foreign-number']],
   ['Цены и условия', [
     {label: 'Проверенные цены', href: '?price=1', info: 'prices'},
     {label: 'Оплата и условия', href: '?view=map', info: 'payment'},
@@ -1288,11 +1423,11 @@ for (const route of directions) {
   searchEntries.push({
     title: route.label, description: page.intro, keywords: directionQueries[route.key], href: route.href
   });
-  page.actions.forEach(([title, description], index) => {
+  page.actions.forEach(([title, description, linkedService], index) => {
     searchEntries.push({
       title, description: route.label + ' · ' + description,
       keywords: (actionQueries[route.key]?.[index] || description) + ' ' + route.label,
-      href: route.href + '&action=' + (index + 1)
+      href: linkedService ? '?service=' + linkedService : route.href + '&action=' + (index + 1)
     });
   });
 }
@@ -1386,6 +1521,7 @@ const indexed = searchEntries.map(entry => ({
   words: meaningfulWords(entry.keywords)
 }));
 const searchIntents = [
+  [/иностранн|зарубежн\S* (?:сим|номер)|\b(?:esim|sim)\b|(?:смс|sms|whatsapp) (?:код|подтвержд)/, '?service=foreign-number'],
   [/часы работ|режим работ|график работ|во сколько (?:откры|работ)|номер телефон|как связаться|где находит/, 'contact'],
   [/не заряжа|не держит заряд|быстро разряжа|замен\S* (?:аккумулятор|батаре)/, '?service=repair&action=3'],
   [/не включа|зависает|не запускает|перезагружа/, '?service=repair&action=1'],
@@ -1914,6 +2050,8 @@ if (priceParam === '1' || priceEntries.some(product => product.id === priceParam
   quickDialog(siteMapDialog);
 } else if (previewParams.get('view') === 'account' || accountCallback) {
   quickDialog(accountDialog);
+} else if (serviceParam === 'foreign-number') {
+  openServiceWindow(serviceParam);
 }
 </script><script>
 (() => {
