@@ -1022,6 +1022,28 @@ const foreignNumberReview = $('#foreignNumberReview');
 const foreignNumberDraft = $('#foreignNumberDraft');
 const foreignNumberStatus = $('#foreignNumberStatus');
 const foreignFields = foreignNumberRequest.elements;
+const foreignDraftKey = 'kadukov-foreign-number-draft-v1';
+const foreignDraftFields = [...foreignFields].filter(field => field.name);
+try {
+  const saved = JSON.parse(sessionStorage.getItem(foreignDraftKey) || '{}');
+  for (const field of foreignDraftFields) {
+    const value = saved?.[field.name];
+    if (typeof value !== 'string') continue;
+    if (field.matches('select')) {
+      if ([...field.options].some(option => option.value === value)) field.value = value;
+    } else {
+      field.value = value.slice(0, field.maxLength);
+    }
+  }
+} catch {}
+
+foreignNumberRequest.addEventListener('input', () => {
+  try {
+    const draft = Object.fromEntries(foreignDraftFields.map(field => [field.name, field.value]));
+    sessionStorage.setItem(foreignDraftKey, JSON.stringify(draft));
+  } catch {}
+});
+
 const foreignChoices = [
   { select: foreignFields.namedItem('platform'), input: foreignFields.namedItem('otherPlatform') },
   { select: foreignFields.namedItem('country'), input: foreignFields.namedItem('otherCountry') }
@@ -1521,7 +1543,7 @@ const indexed = searchEntries.map(entry => ({
   words: meaningfulWords(entry.keywords)
 }));
 const searchIntents = [
-  [/иностранн|зарубежн\S* (?:сим|номер)|\b(?:esim|sim)\b|(?:смс|sms|whatsapp) (?:код|подтвержд)/, '?service=foreign-number'],
+  [/иностранн|зарубежн\S* (?:сим|номер)|\b(?:esim|sim)\b|(?:смс|sms|whatsapp|ватсап) (?:код|подтвержд)|(?:код|подтвержд\S*) (?:(?:в|по|через) )?(?:whatsapp|ватсап)/, '?service=foreign-number'],
   [/часы работ|режим работ|график работ|во сколько (?:откры|работ)|номер телефон|как связаться|где находит/, 'contact'],
   [/не заряжа|не держит заряд|быстро разряжа|замен\S* (?:аккумулятор|батаре)/, '?service=repair&action=3'],
   [/не включа|зависает|не запускает|перезагружа/, '?service=repair&action=1'],
@@ -1630,6 +1652,9 @@ function closeQuickSearch() {
 
 quickQuery.addEventListener('focus', renderQuickResults);
 quickQuery.addEventListener('input', renderQuickResults);
+quickSearch.addEventListener('focusout', event => {
+  if (event.relatedTarget && !quickSearch.contains(event.relatedTarget)) closeQuickSearch();
+});
 quickSearch.addEventListener('submit', event => {
   event.preventDefault();
   if (quickResults.hidden) renderQuickResults();
