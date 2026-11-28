@@ -219,6 +219,7 @@ body dialog.quick-dialog:is(.workspace-dialog, #quickInfoDialog, #accountDialog)
 .workspace-panel h2 { min-width:0; margin:0; font-size:clamp(1.05rem, 3.5vw, 1.65rem); line-height:1.18; overflow-wrap:anywhere; }
 .workspace-panel .window-tools { flex:none; display:flex; gap:5px; }
 body .workspace-panel .window-tools .square { display:grid; place-items:center; width:44px; height:44px; padding:0; min-width:0; font-size:1.1rem; }
+body .workspace-panel .window-tools .window-minimize { display:none; }
 .workspace-content {
   flex:1; min-height:0; min-width:0; width:100%; max-width:1000px; align-self:center;
   padding:clamp(12px, 3vw, 26px); overflow:auto; overscroll-behavior:contain;
@@ -237,6 +238,8 @@ body .workspace-panel .window-tools .square { display:grid; place-items:center; 
 #storefrontDialog .workspace-content { max-width:none; padding:0; overflow:hidden; }
 #workspaceCatalog { display:block; width:100%; height:100%; border:0; }
 @media (max-width:760px) {
+  body .workspace-panel .window-tools .window-shift { display:none; }
+  body .workspace-panel .window-tools .window-minimize { display:inline-flex; min-height:44px; padding:0 9px; white-space:nowrap; }
   .workspace-stage { flex-direction:column; }
   .workspace-stage > .workspace-dock, #workspaceHome .workspace-dock {
     display:flex; flex:none; align-items:center; gap:8px; min-width:0;
@@ -1193,8 +1196,14 @@ function leaveWindow(side, discard = false, focusHome = true) {
     const focusTarget = restored?.getClientRects().length ? restored : $('[data-site-view="map"]');
     focusTarget.focus({preventScroll: true});
     closeQuickSearch();
-    if (!discard) workspaceHome.scrollIntoView({block: 'nearest', behavior: 'instant'});
-    else if (scrollY !== top) window.scrollTo({top, behavior: 'instant'});
+    if (!discard) {
+      workspaceHome.scrollIntoView({block: 'nearest', behavior: 'instant'});
+      if (restored && workspaceDock.scrollWidth > workspaceDock.clientWidth) {
+        const dockBounds = workspaceDock.getBoundingClientRect();
+        const tabBounds = restored.getBoundingClientRect();
+        workspaceDock.scrollLeft += Math.max(0, tabBounds.right - dockBounds.right) + Math.min(0, tabBounds.left - dockBounds.left);
+      }
+    } else if (scrollY !== top) window.scrollTo({top, behavior: 'instant'});
   }
 }
 
@@ -1357,8 +1366,10 @@ for (const dialog of quickDialogs) {
   close.before(controls);
   const left = workspaceButton('←', () => leaveWindow('left'), 'Сдвинуть окно влево');
   const right = workspaceButton('→', () => leaveWindow('right'), 'Сдвинуть окно вправо');
-  left.className = right.className = 'square';
-  controls.append(search, left, right, close);
+  const minimize = workspaceButton('Свернуть', () => leaveWindow());
+  left.className = right.className = 'square window-shift';
+  minimize.className = 'btn alt window-minimize';
+  controls.append(search, left, right, minimize, close);
   close.onclick = () => leaveWindow(null, true);
   dialog.addEventListener('cancel', event => {
     event.preventDefault();
