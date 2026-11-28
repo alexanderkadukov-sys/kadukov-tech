@@ -25,6 +25,12 @@
   .catalog-embedded .searchbar { max-width: none; }
   .empty .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 12px; }
   .empty .actions button { margin: 0; }
+  @media (min-width:1200px) {
+    body { max-width:2080px; padding-inline:clamp(24px, 2.5vw, 50px); }
+    .catalog-mast .searchbar { max-width:1000px; }
+    .catalog-embedded .searchbar { max-width:none; }
+    .products { grid-template-columns:repeat(auto-fill,minmax(max(205px, calc((100% - 60px) / 6)),1fr)); gap:12px; }
+  }
 </style>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2"></script><script defer src="../verified-parts.js?v=1"></script><script defer src="catalog.js?v=409"></script></head>
 <body><svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true"><defs>
