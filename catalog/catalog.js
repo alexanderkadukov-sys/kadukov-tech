@@ -4,9 +4,8 @@ const $=id=>document.getElementById(id),container=$('products'), status=$('statu
 const say=s=>status.textContent=s;
 const node=(tag,value,cls)=>{const el=document.createElement(tag);if(value!==undefined)el.textContent=value;if(cls)el.className=cls;return el;};
 const button=(label,fn)=>{const el=node('button',label);el.type='button';el.addEventListener('click',fn);return el;};
-if(!window.supabase?.createClient){say('Не удалось подключить каталог. Обновите страницу.');return;}
-const client=window.supabase.createClient('https://qlggbdzodqagtxqifslg.supabase.co',"sb_publishable_xmpxNkuvDizZoYOl12CJCw_lM-h9kSW",{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
-const bucket=client.storage.from('catalog-photos'), PAGE=12,labels={electronics:'Электроника',parts:'Запчасти'},stocks={unknown:'Наличие уточняется',in_stock:'В наличии',on_order:'Под заказ',out_of_stock:'Нет в наличии'};
+const client=window.supabase?.createClient?.('https://qlggbdzodqagtxqifslg.supabase.co',"sb_publishable_xmpxNkuvDizZoYOl12CJCw_lM-h9kSW",{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+const bucket=client?.storage.from('catalog-photos'), PAGE=12,labels={electronics:'Электроника',parts:'Запчасти'},stocks={unknown:'Наличие уточняется',in_stock:'В наличии',on_order:'Под заказ',out_of_stock:'Нет в наличии'};
 const checkedParts = (window.kadukovVerifiedParts || []).map(part => ({
   id: part.id, name: part.name, catalog: 'parts', category: part.category, brand: part.brand,
   compatibility: part.compatibility, description: part.details || 'Цена за деталь. Установка рассчитывается отдельно.',
@@ -22,10 +21,18 @@ function setTab(){for(const b of document.querySelectorAll('[data-type]'))b.setA
 function filterSummary(){const a=[];if(applied.stock)a.push(stocks[applied.stock]);if(applied.brand)a.push(applied.brand);if(applied.min!==null)a.push('от '+applied.min+' ₽');if(applied.max!==null)a.push('до '+applied.max+' ₽');$('filterCount').hidden=!a.length;$('filterCount').textContent=a.length;$('activeFilters').hidden=!a.length;$('filterText').textContent=a.join(' · ');}
 function resetFilters(){applied={stock:'',brand:'',min:null,max:null};for(const id of ['stock','brandFilter','minPrice','maxPrice'])$(id).value='';filterSummary();page=0;load();}
 function toggleFilters(open){$('filters').hidden=!open;$('toggleFilters').setAttribute('aria-expanded',String(open));}
-function contact(){const a=node('a','Написать','button primary');a.href='https://t.me/Kaduk0v';a.target='_blank';a.rel='noopener noreferrer';return a;}
+function contact(x) {
+ const link = node('a','Написать','button primary');
+ const url = new URL('https://t.me/Kaduk0v');
+ const lines = ['Здравствуйте! Подскажите наличие и цену:', x.name, x.variant, x.sku ? 'Артикул: ' + x.sku : ''];
+ url.searchParams.set('text', lines.filter(Boolean).join('\n'));
+ link.href = url.href;
+ link.target = '_blank';
+ link.rel = 'noopener noreferrer';
+ return link;
+}
 function copyItem(x){const b=button('Копировать товар',async()=>{try{await navigator.clipboard.writeText([x.name,x.sku,price(x)].filter(Boolean).join(' · '));b.textContent='Скопировано';}catch{b.textContent='Не удалось скопировать';}});return b;}
 function stockLabel(x){const p=node('p',stocks[x.stock_status]||stocks.unknown,'stock');p.dataset.status=x.stock_status;return p;}
-let detailEpoch=0;
 function showDetail(x,cover){
  $('detailTitle').textContent=x.name;
  const body=$('detailBody');
@@ -44,7 +51,7 @@ function showDetail(x,cover){
  if(x.compatibility)info.append(node('p','Совместимость: '+x.compatibility));
  if(x.description)info.append(node('p',x.description));
  const actions=node('div',undefined,'actions');
- actions.append(contact(),copyItem(x));info.append(actions);body.append(info);
+ actions.append(contact(x),copyItem(x));info.append(actions);body.append(info);
  const dialog=$('productDialog');
  if(!dialog.open)dialog.showModal();
 }
@@ -70,7 +77,7 @@ function card(x,token){
  body.append(stockLabel(x));
  const actions=node('div',undefined,'actions');
  const details=button('Подробнее',()=>showDetail(x,photo?.querySelector('img')));
- details.className='secondary';actions.append(details,contact());body.append(actions);item.append(body);
+ details.className='secondary';actions.append(details,contact(x));body.append(actions);item.append(body);
  return item;
 }
 function safeTerms(q){return q.normalize('NFKC').toLowerCase().replace(/айфон[ауы]?/g,'iphone').replace(/самсунг[ауы]?/g,'samsung').replace(/ксиаоми|сяоми/g,'xiaomi').replace(/ё/g,'е').replace(/(iphone|samsung|xiaomi|galaxy|poco)(?=[a-z0-9])/g,'$1 ').replace(/([a-zа-я])(\d{1,})/gu,'$1 $2').replace(/(\d)([a-zа-я])/gu,'$1 $2').replace(/[^\p{L}\p{N}\s-]/gu,' ').trim().split(/\s+/).filter(Boolean).slice(0,5);}
@@ -81,10 +88,11 @@ function partTerms(value) {
   .replace(/экран(?:ы|а)?/g,'дисплей').replace(/батаре[а-я]*/g,'аккумулятор').replace(/\b(?:iphone|galaxy|redmi)(?=\d)/g,'$& ')
   .replace(/(^|\s)[сs]\s*(?=\d)/g,'$1s').replace(/(^|\s)[аa]\s*(?=\d)/g,'$1a')
   .replace(/(^|\s)(\d+)[асе](?=\s|$)/g,(_,space,n)=>space+n+({а:'a',с:'c',е:'e'})[_.slice(-1)])
+  .replace(/(\b(?:samsung(?:\s+galaxy)?|galaxy)\s+)10\b/g,'$1s10')
   .split(/[^\p{L}\p{N}]+/u).filter(Boolean);
 }
 function filterChecked(queryText) {
- const terms=partTerms(queryText).filter(word=>!['купить','цена','на','для','и'].includes(word));
+ const terms=partTerms(queryText).filter(word=>!['купить','кутить','кпить','цена','на','для','и'].includes(word));
  const brand=partTerms(applied.brand);
  return checkedParts.filter(x=>{
   if(type==='electronics'||(applied.stock&&applied.stock!==x.stock_status))return false;
@@ -114,10 +122,23 @@ function showRows(rows,token) {
  say(rows.length?'Показано: '+Math.min(rows.length,PAGE):'Нет совпадений');
  $('pager').hidden=page===0&&rows.length<=PAGE;$('prev').disabled=page===0;$('next').disabled=rows.length<=PAGE;
 }
+function showFallback(localRows, sort, start, token) {
+ const fallback = localRows.sort((a,b) => compareProducts(a,b,sort)).slice(start,start+PAGE+1);
+ if (fallback.length) {
+  showRows(fallback,token);
+  say('Показаны проверенные цены. Остальные товары не загрузились.');
+ } else {
+  say('Не удалось загрузить каталог. Нажмите «Обновить».');
+  container.append(node('div','Каталог временно недоступен. Свяжитесь с мастером.','empty'));
+  $('pager').hidden = page === 0;
+  $('prev').disabled = page === 0;
+ }
+}
 async function load(){clearTimeout(debounce);if($('productDialog').open)$('productDialog').close();const token=++epoch;release();container.replaceChildren();say('Загрузка товаров…');$('prev').disabled=true;$('next').disabled=true;$('page').textContent=page+1;
  const localRows=filterChecked($('search').value);
  const sort=$('sort').value;
  const start=page*PAGE;
+ if (!client) { showFallback(localRows,sort,start,token); return; }
  const first=Math.max(0,start-localRows.length);
  try{let query=client.from('catalog_products').select('id,sku,name,catalog,category,brand,compatibility,description,price_rub,stock_status,created_at').eq('published',true);
  if(type)query=query.eq('catalog',type);if(applied.stock)query=query.eq('stock_status',applied.stock);
@@ -132,15 +153,7 @@ async function load(){clearTimeout(debounce);if($('productDialog').open)$('produ
  showRows(merged.slice(start-first,start-first+PAGE+1),token);
  }catch{
   if(token!==epoch)return;
-  const fallback=localRows.sort((a,b)=>compareProducts(a,b,sort)).slice(start,start+PAGE+1);
-  if(fallback.length){
-   showRows(fallback,token);
-   say('Показаны проверенные цены. Остальные товары не загрузились.');
-  }else{
-   say('Не удалось загрузить каталог. Нажмите «Обновить».');
-   container.append(node('div','Каталог временно недоступен. Свяжитесь с мастером.','empty'));
-   $('prev').disabled=page===0;
-  }
+  showFallback(localRows,sort,start,token);
  }}
 for(const b of document.querySelectorAll('[data-type]'))b.addEventListener('click',()=>{type=b.dataset.type;category='';page=0;setTab();load();});
 for(const b of document.querySelectorAll('[data-cat]'))b.addEventListener('click',()=>{const selected=b.dataset.cat;if(category===selected){category='';}else{category=selected;type=categoryMap[selected].type;}page=0;setTab();load();});
@@ -149,5 +162,9 @@ $('sort').addEventListener('change',()=>{page=0;load();});
 $('toggleFilters').addEventListener('click',()=>toggleFilters($('filters').hidden));
 $('applyFilters').addEventListener('click',()=>{const min=$('minPrice').value===''?null:Number($('minPrice').value),max=$('maxPrice').value===''?null:Number($('maxPrice').value);if([min,max].some(v=>v!==null&&(!Number.isInteger(v)||v<0||v>100000000))||(min!==null&&max!==null&&min>max)){say('Проверьте диапазон цен');return;}applied={stock:$('stock').value,brand:$('brandFilter').value.trim(),min,max};filterSummary();toggleFilters(false);page=0;load();});
 $('resetFilters').addEventListener('click',()=>{resetFilters();toggleFilters(false);});$('clearActive').addEventListener('click',resetFilters);
-$('refresh').addEventListener('click',()=>load());$('prev').addEventListener('click',()=>{if(page>0){page--;load();}});$('next').addEventListener('click',()=>{page++;load();});window.addEventListener('pagehide',()=>{++epoch;release();});window.addEventListener('pageshow',e=>{if(e.persisted)load();});setTab();filterSummary();load();
+$('refresh').addEventListener('click', () => {
+ if (client) load();
+ else location.reload();
+});
+$('prev').addEventListener('click',()=>{if(page>0){page--;load();}});$('next').addEventListener('click',()=>{page++;load();});window.addEventListener('pagehide',()=>{++epoch;release();});window.addEventListener('pageshow',e=>{if(e.persisted)load();});setTab();filterSummary();load();
 })();
