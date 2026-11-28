@@ -170,6 +170,82 @@ body #accountDialog .account-form button.btn { min-height:46px; }
   body dialog#accountDialog.quick-dialog[open] { inset:auto 0 0; margin:0 auto; width:100%; max-width:100%; height:auto; max-height:90dvh; border-radius:20px 20px 0 0; padding:14px 16px max(20px,env(safe-area-inset-bottom)); overflow-y:auto; }
   body #accountDialog > header { position:static; min-height:44px; padding:0 0 8px; }
 }
+</style><style>
+#workspaceHome[hidden], .workspace-rail[hidden] { display:none; }
+#workspaceHome { display:flex; flex-wrap:wrap; gap:8px; padding-block:10px; }
+#workspaceHome .workspace-right { margin-left:auto; }
+body dialog.quick-dialog:is(.workspace-dialog, #quickInfoDialog, #accountDialog)[open] {
+  --window-nav:#112431; --window-text:#edf8fa; --window-accent:#74f4d7;
+  box-sizing:border-box; display:flex; flex-direction:column; position:fixed; inset:0;
+  width:100%; max-width:none; height:100vh; height:100dvh; max-height:none;
+  margin:0; border:1px solid var(--window-accent); border-radius:0;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background:var(--window-nav); color:var(--ink); overflow:hidden;
+  box-shadow:inset 0 0 13px #74f4d725;
+}
+.workspace-toolbar {
+  position:relative; z-index:1; display:flex; flex-wrap:wrap; align-items:center;
+  gap:8px; padding:7px clamp(9px, 2vw, 24px); border-bottom:1px solid #74f4d755;
+  color:var(--window-text); background:var(--window-nav);
+}
+.workspace-toolbar button, .workspace-toolbar summary, .workspace-rail button {
+  display:flex; align-items:center; min-height:40px; padding:6px 12px;
+  border:1px solid #43736f; border-radius:7px; color:#edf8fa; background:#162e3b;
+  font:inherit; font-size:.875rem; font-weight:650; text-align:left; overflow-wrap:anywhere; cursor:pointer;
+}
+.workspace-toolbar button:hover, .workspace-toolbar summary:hover, .workspace-rail button:hover { background:#244650; }
+.workspace-toolbar :is(button,summary):focus-visible, .workspace-rail button:focus-visible { outline:2px solid #74f4d7; outline-offset:-3px; }
+.workspace-toolbar summary { list-style:none; gap:8px; }
+.workspace-toolbar summary::-webkit-details-marker { display:none; }
+.workspace-toolbar summary::after { content:'▾'; }
+.workspace-picker {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; position:absolute;
+  left:clamp(9px, 2vw, 24px); top:100%; z-index:1; width:min(460px, calc(100% - 18px));
+  max-height:calc(100dvh - 80px); padding:8px; overflow:auto;
+  color:var(--window-text); background:var(--window-nav); border:1px solid #43736f;
+  border-radius:0 0 10px 10px; box-shadow:0 10px 22px #08192345;
+}
+.workspace-stage { display:flex; flex:1; min-height:0; min-width:0; overflow:hidden; }
+.workspace-panel { display:flex; flex:1; min-width:0; min-height:0; flex-direction:column; background:var(--surface); }
+.workspace-panel > header {
+  display:flex; align-items:center; justify-content:space-between; flex:none;
+  min-height:58px; gap:8px; padding:6px clamp(9px, 2vw, 24px); border-bottom:1px solid var(--line);
+  touch-action:pan-y; cursor:grab; user-select:none;
+}
+.workspace-panel > header:active { cursor:grabbing; }
+.workspace-panel h2 { min-width:0; margin:0; font-size:clamp(1.05rem, 3.5vw, 1.65rem); line-height:1.18; overflow-wrap:anywhere; }
+.workspace-panel .window-tools { flex:none; display:flex; gap:5px; }
+body .workspace-panel .window-tools .square { display:grid; place-items:center; width:44px; height:44px; padding:0; min-width:0; font-size:1.1rem; }
+.workspace-content {
+  flex:1; min-height:0; min-width:0; width:100%; max-width:1000px; align-self:center;
+  padding:clamp(12px, 3vw, 26px); overflow:auto; overscroll-behavior:contain;
+}
+.workspace-rail { display:flex; flex-wrap:wrap; gap:6px; }
+.workspace-stage .workspace-rail {
+  flex:0 0 clamp(120px, 14vw, 185px); flex-flow:column nowrap; padding:8px; overflow:auto;
+  background:var(--window-nav); scrollbar-width:thin;
+}
+.workspace-stage .workspace-rail button { width:100%; flex:none; }
+#storefrontDialog .workspace-content { max-width:none; padding:0; overflow:hidden; }
+#workspaceCatalog { display:block; width:100%; height:100%; border:0; }
+@media (max-width:760px) {
+  .workspace-stage { display:grid; grid-template-rows:minmax(0,1fr) auto; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .workspace-panel { grid-area:1 / 1 / 2 / -1; }
+  .workspace-stage .workspace-left { grid-area:2 / 1; }
+  .workspace-stage .workspace-right { grid-area:2 / 2; }
+  .workspace-stage:has(> .workspace-rail[hidden]) > .workspace-rail { grid-column:1 / -1; }
+  .workspace-stage .workspace-rail {
+    flex-flow:row wrap; align-content:flex-start; max-height:min(104px, 23dvh);
+    border-top:1px solid #74f4d755; padding:5px;
+  }
+  .workspace-stage .workspace-rail button { width:auto; max-width:100%; min-height:40px; }
+  #workspaceHome .workspace-right { margin-left:0; }
+}
+@media (max-width:450px) {
+  .workspace-panel .window-tools { gap:3px; }
+  body .workspace-panel .window-tools .square { width:35px; height:42px; }
+  .workspace-content { padding:12px; }
+}
 </style><link rel="stylesheet" href="service-strip.css"><link rel="stylesheet" href="workshop-request.css?v=1"><script src="verified-parts.js?v=1"></script><script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2" integrity="sha384-7i/4BYWz4Mn+lJfg2HWfEPfZQ7tmFKF3CTSKlXBpxWjNlLjcg+T6smpHG4gLmU1u" crossorigin="anonymous"></script></head><body><svg xmlns="http://www.w3.org/2000/svg" style="display:none"><defs>
 <symbol id="toolsIcon" viewBox="0 0 24 24"><path d="M14 7a5 5 0 0 0-6-5l2.5 2.5-1 3-3 1L4 6a5 5 0 0 0 6 6l8 8a2 2 0 0 0 3-3l-8-8a5 5 0 0 0 1-2Z"/></symbol>
 <symbol id="profileIcon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2"/></symbol>
@@ -195,6 +271,7 @@ body #accountDialog .account-form button.btn { min-height:46px; }
 </div></div>
 </header>
 <main id="top">
+<div class="wrap" id="workspaceHome" hidden></div>
 <section id="quickHome" class="quick-home" aria-labelledby="quickHomeTitle">
 <div class="wrap">
   <div class="hub-grid">
@@ -326,6 +403,10 @@ body #accountDialog .account-form button.btn { min-height:46px; }
 <div class="quick-info-footer"><a class="btn alt" href="catalog/">Открыть актуальный каталог ↗</a></div><div id="quickCatalogContent"></div>
 <p class="request-status" id="quickCatalogStatus" role="status"></p>
 <div class="quick-info-footer"><button type="button" class="btn alt" id="catalogCart">Мой запрос</button></div>
+</dialog>
+<dialog class="modal quick-dialog" id="storefrontDialog" aria-labelledby="storefrontTitle">
+<header><h2 id="storefrontTitle" tabindex="-1">Каталог</h2><button type="button" class="square" data-close-quick aria-label="Закрыть">×</button></header>
+<iframe id="workspaceCatalog" title="Каталог техники и запчастей"></iframe>
 </dialog>
 <dialog class="modal quick-dialog" id="siteMapDialog" aria-labelledby="siteMapTitle">
   <header><h2 id="siteMapTitle" tabindex="-1">Карта сайта</h2><button type="button" class="square" data-close-quick aria-label="Закрыть">×</button></header>
@@ -772,7 +853,7 @@ $('#checkout').onclick = () => {
   validateFields();
   clearFeedback();
   saveDraft();
-  $('#cartDialog').close();
+  leaveWindow(null, true, false);
   focusRequest();
 };
 
@@ -995,26 +1076,113 @@ const siteMapDialog = $('#siteMapDialog');
 const serviceDialog = $('#serviceDialog');
 const foreignNumberDialog = $('#foreignNumberDialog');
 const accountDialog = $('#accountDialog');
-const quickDialogs = [quickInfoDialog, quickRequestDialog, quickCatalogDialog, siteMapDialog, serviceDialog, foreignNumberDialog, accountDialog, $('#cartDialog')];
+const storefrontDialog = $('#storefrontDialog');
+const storefrontFrame = $('#workspaceCatalog');
+const quickDialogs = [quickInfoDialog, quickRequestDialog, quickCatalogDialog, siteMapDialog, serviceDialog, foreignNumberDialog, accountDialog, storefrontDialog, $('#cartDialog')];
 const requestHome = request.parentElement;
 const catalogPanel = $('#catalog');
 const catalogHome = catalogPanel.parentElement;
+const workspaceHome = $('#workspaceHome');
+const workspaceTabs = new Map();
+let activeWindow;
 let recognizer = null;
 
-function quickDialog(dialog, top = scrollY) {
-  closeQuickSearch();
-  for (const current of quickDialogs) {
-    if (current !== dialog && current.open) current.close();
+function workspaceButton(text, handler, label = text) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.textContent = text;
+  button.setAttribute('aria-label', label);
+  button.title = label;
+  button.onclick = handler;
+  return button;
+}
+
+const workspaceToolbar = document.createElement('nav');
+workspaceToolbar.className = 'workspace-toolbar';
+workspaceToolbar.setAttribute('aria-label', 'Навигация по окнам');
+const workspacePicker = document.createElement('details');
+const workspacePickerToggle = document.createElement('summary');
+workspacePickerToggle.textContent = 'Открыть раздел';
+const workspacePickerItems = document.createElement('div');
+workspacePickerItems.className = 'workspace-picker';
+workspacePicker.append(workspacePickerToggle, workspacePickerItems);
+workspaceToolbar.append(workspaceButton(document.body.classList.contains('service-view') ? '← К странице' : '← Главная', () => leaveWindow()), workspacePicker);
+const workspaceRails = Object.fromEntries(['left', 'right'].map((side, index) => {
+  const rail = document.createElement('nav');
+  rail.className = 'workspace-rail workspace-' + side;
+  rail.setAttribute('aria-label', index === 0 ? 'Окна слева' : 'Окна справа');
+  return [side, rail];
+}));
+
+function renderWorkspace() {
+  const stage = activeWindow?.dialog.querySelector('.workspace-stage');
+  const tabs = [...workspaceTabs.values()].filter(tab => tab !== activeWindow);
+  for (const [side, rail] of Object.entries(workspaceRails)) {
+    const buttons = tabs.filter(tab => tab.side === side).map(tab => {
+      const button = workspaceButton(tab.label, tab.restore, 'Открыть окно «' + tab.label + '»');
+      button.dataset.windowKey = tab.key;
+      return button;
+    });
+    rail.replaceChildren(...buttons);
+    rail.hidden = !buttons.length;
+    if (stage && side === 'left') stage.prepend(rail);
+    else (stage || workspaceHome).append(rail);
   }
+  workspaceHome.hidden = Boolean(stage) || !tabs.length;
+}
+
+function leaveWindow(side, discard = false, focusHome = true) {
+  if (!activeWindow) return;
+  const tab = activeWindow;
+  const top = scrollY;
+  tab.scrollTop = tab.dialog.querySelector('.workspace-content').scrollTop;
+  if (side) tab.side = side;
+  if (discard) workspaceTabs.delete(tab.key);
+  activeWindow = null;
+  workspacePicker.open = false;
+  tab.dialog.close();
+  if (focusHome) {
+    renderWorkspace();
+    const restored = discard ? tab.opener : [...workspaceHome.querySelectorAll('button')].find(button =>
+      button.dataset.windowKey === tab.key);
+    (restored?.getClientRects().length ? restored : quickQuery).focus({preventScroll: true});
+    if (scrollY !== top) window.scrollTo({top, behavior: 'instant'});
+  }
+}
+
+function quickDialog(dialog, {key = dialog.id, restore = () => quickDialog(dialog)} = {}) {
+  const top = scrollY;
+  const opener = document.activeElement;
+  closeQuickSearch();
+  workspacePicker.open = false;
+  const heading = dialog.querySelector('h2');
+  const content = dialog.querySelector('.workspace-content');
+  const sameWindow = activeWindow?.key === key;
+  const sharedDialog = activeWindow?.dialog === dialog;
+  if (!sameWindow && activeWindow) {
+    if (sharedDialog) activeWindow.scrollTop = content.scrollTop;
+    else leaveWindow(null, false, false);
+  }
+  const tab = workspaceTabs.get(key) || {key, dialog, side: 'right', opener, scrollTop: 0};
+  Object.assign(tab, {label: heading.textContent, restore});
+  workspaceTabs.set(key, tab);
+  activeWindow = tab;
+  dialog.prepend(workspaceToolbar);
+  renderWorkspace();
   if (!dialog.open) dialog.showModal();
-  dialog.querySelector('h2').focus({preventScroll: true});
+  heading.focus({preventScroll: true});
+  if (!sameWindow) content.scrollTop = tab.scrollTop;
   if (scrollY !== top) window.scrollTo({top, behavior: 'instant'});
 }
 
 function openQuickRequest() {
-  const top = scrollY;
   $('#quickRequestContent').append(request);
-  quickDialog(quickRequestDialog, top);
+  quickDialog(quickRequestDialog, {restore: openQuickRequest});
+}
+
+function openStorefront(href = 'catalog/') {
+  if (storefrontFrame.getAttribute('src') !== href) storefrontFrame.src = href;
+  quickDialog(storefrontDialog, {restore: () => openStorefront(href)});
 }
 
 const foreignNumberRequest = $('#foreignNumberRequest');
@@ -1100,10 +1268,10 @@ $('#editForeignNumberRequest').onclick = () => {
 };
 
 function openQuickCatalog(nextMode) {
-  const top = scrollY;
-  catalog(nextMode || mode);
+  const selectedMode = nextMode || mode;
+  catalog(selectedMode);
   $('#quickCatalogContent').append(catalogPanel);
-  quickDialog(quickCatalogDialog, top);
+  quickDialog(quickCatalogDialog, {restore: () => openQuickCatalog(selectedMode)});
 }
 
 quickRequestDialog.addEventListener('close', () => {
@@ -1114,6 +1282,18 @@ quickCatalogDialog.addEventListener('close', () => {
 });
 
 for (const dialog of quickDialogs) {
+  dialog.classList.add('workspace-dialog');
+  const header = dialog.querySelector('header');
+  const stage = document.createElement('div');
+  stage.className = 'workspace-stage';
+  const panel = document.createElement('div');
+  panel.className = 'workspace-panel';
+  const content = document.createElement('div');
+  content.className = 'workspace-content';
+  content.append(...[...dialog.childNodes].filter(node => node !== header));
+  panel.append(header, content);
+  stage.append(panel);
+  dialog.append(stage);
   const close = dialog.querySelector('[data-close-quick]');
   const controls = document.createElement('div');
   controls.className = 'window-tools';
@@ -1124,15 +1304,57 @@ for (const dialog of quickDialogs) {
   search.setAttribute('aria-label', 'Поиск по сайту');
   search.innerHTML = ico('searchIcon');
   close.before(controls);
-  controls.append(search, close);
-  close.onclick = () => dialog.close();
+  const left = workspaceButton('←', () => leaveWindow('left'), 'Сдвинуть окно влево');
+  const right = workspaceButton('→', () => leaveWindow('right'), 'Сдвинуть окно вправо');
+  left.className = right.className = 'square';
+  controls.append(search, left, right, close);
+  close.onclick = () => leaveWindow(null, true);
+  dialog.addEventListener('cancel', event => {
+    event.preventDefault();
+    if (workspacePicker.open) {
+      workspacePicker.open = false;
+      workspacePickerToggle.focus();
+    } else leaveWindow();
+  });
   dialog.addEventListener('click', event => {
-    if (event.target !== dialog) return;
-    const bounds = dialog.getBoundingClientRect();
-    if (event.clientX < bounds.left || event.clientX > bounds.right ||
-        event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+    if (!workspacePicker.contains(event.target)) workspacePicker.open = false;
+  });
+  let drag;
+  header.addEventListener('pointerdown', event => {
+    if (!event.isPrimary || event.button !== 0 || controls.contains(event.target)) return;
+    drag = {id: event.pointerId, startX: event.clientX};
+    header.setPointerCapture(event.pointerId);
+  });
+  header.addEventListener('pointermove', event => {
+    if (drag?.id !== event.pointerId) return;
+    const distance = event.clientX - drag.startX;
+    panel.style.transform = `translateX(${Math.max(-44, Math.min(44, distance))}px)`;
+  });
+  header.addEventListener('pointerup', event => {
+    if (drag?.id !== event.pointerId) return;
+    const distance = event.clientX - drag.startX;
+    if (Math.abs(distance) >= 52) leaveWindow(distance < 0 ? 'left' : 'right');
+  });
+  header.addEventListener('lostpointercapture', () => {
+    drag = null;
+    panel.style.transform = '';
   });
 }
+
+storefrontFrame.addEventListener('load', () => {
+  const frameDocument = storefrontFrame.contentDocument;
+  if (!frameDocument) return;
+  frameDocument.addEventListener('click', event => {
+    const link = event.target.closest('a[href]');
+    if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    if (link.href !== new URL('./', location.href).href) return;
+    event.preventDefault();
+    leaveWindow();
+  });
+  frameDocument.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !event.defaultPrevented) leaveWindow();
+  });
+});
 
 const topics = [
   {
@@ -1256,7 +1478,7 @@ function openQuickInfo(key) {
   const product = priceEntries.find(value => value.id === key);
   const topic = topics.find(value => value.key === key);
   const isPriceList = key === 'prices';
-  $('#quickInfoTitle').textContent = product?.name || topic?.title || 'Быстрая информация';
+  $('#quickInfoTitle').textContent = product?.name || topic?.title || (isPriceList ? 'Проверенные цены' : 'Быстрая информация');
   $('#quickInfoIndex').hidden = Boolean(topic || product);
   const back = $('#quickInfoBack');
   back.hidden = !topic && !product;
@@ -1282,7 +1504,7 @@ function openQuickInfo(key) {
   });
   const priceButtons = isPriceList ? priceEntries.map(product => resultControl(priceResult(product))) : [];
   $('#quickInfoAnswer').replaceChildren(...priceButtons, ...paragraphs);
-  quickDialog(quickInfoDialog);
+  quickDialog(quickInfoDialog, {key: 'info:' + (key || ''), restore: () => openQuickInfo(key)});
 }
 
 for (const topic of topics) {
@@ -1342,8 +1564,18 @@ function openServiceWindow(key) {
     return link;
   });
   $('#serviceDialogOptions').replaceChildren(...options);
-  quickDialog(serviceDialog);
+  quickDialog(serviceDialog, {key: 'service:' + key, restore: () => openServiceWindow(key)});
 }
+
+workspacePickerItems.append(
+  ...directions.map(({key, label}) => workspaceButton(label, () => openServiceWindow(key))),
+  workspaceButton('Каталог', () => openStorefront(storefrontFrame.getAttribute('src') || 'catalog/')),
+  workspaceButton('Описать задачу', openQuickRequest),
+  workspaceButton('Проверенные цены', () => openQuickInfo('prices')),
+  workspaceButton('Контакты', () => openQuickInfo('contact')),
+  workspaceButton('Кабинет', () => quickDialog(accountDialog)),
+  workspaceButton('Карта сайта', () => quickDialog(siteMapDialog))
+);
 
 const mapGroups = [
   ['Ремонт и техника', ['phone', 'pc', 'parts', 'shop']],
@@ -1383,8 +1615,14 @@ for (const [title, items] of mapGroups) {
 }
 
 document.addEventListener('click', event => {
-  const control = event.target.closest('[data-page], [data-site-view], [data-window-search], [data-route]');
+  const control = event.target.closest('[data-page], [data-site-view], [data-window-search], [data-route], a[href^="catalog/"]');
   if (!control || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+  const href = control.getAttribute('href');
+  if (href?.startsWith('catalog/')) {
+    event.preventDefault();
+    openStorefront(href);
+    return;
+  }
   if (control.hasAttribute('data-route')) {
     const params = new URL(control.href).searchParams;
     const target = directions.find(route => route.href === '?service=' + params.get('service'));
@@ -1399,7 +1637,7 @@ document.addEventListener('click', event => {
   } else if (control.dataset.siteView) {
     quickDialog(control.dataset.siteView === 'map' ? siteMapDialog : accountDialog);
   } else {
-    for (const dialog of quickDialogs) if (dialog.open) dialog.close();
+    leaveWindow();
     quickQuery.focus();
     renderQuickResults();
   }
@@ -1856,7 +2094,7 @@ async function runAccountAction(action, onFailure) {
   try {
     await action();
   } catch (error) {
-    if (accountDialog.open) onFailure(error);
+    if (workspaceTabs.has(accountDialog.id)) onFailure(error);
   } finally {
     accountOperation = false;
     accountBusy(false);
@@ -1999,7 +2237,7 @@ accountEmailForm.addEventListener('submit', async event => {
       });
       if (error) throw error;
       try { accountStorage?.setItem(accountRedirectKey, 'email:' + Date.now()); } catch {}
-      if (accountDialog.open) requestCodeStep(email);
+      if (workspaceTabs.has(accountDialog.id)) requestCodeStep(email);
     }, error => {
       accountStatus.textContent = error.status === 429
         ? 'Достигнут лимит отправки писем. Проверьте входящие или попробуйте позже.'
@@ -2059,6 +2297,7 @@ accountSignOut.addEventListener('click', async () => {
   if (accountDialog.open) $('#accountTitle').focus();
 });
 accountDialog.addEventListener('close', () => {
+  if (workspaceTabs.has(accountDialog.id)) return;
   if (accountPreview || accountClient) resetAccountCode();
   if (accountClient) accountEmail.value = '';
 });
