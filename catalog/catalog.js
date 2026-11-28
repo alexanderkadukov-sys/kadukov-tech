@@ -80,11 +80,16 @@ function card(x,token){
  details.className='secondary';actions.append(details,contact(x));body.append(actions);item.append(body);
  return item;
 }
-function safeTerms(q){return q.normalize('NFKC').toLowerCase().replace(/айфон[ауы]?/g,'iphone').replace(/самсунг[ауы]?/g,'samsung').replace(/ксиаоми|сяоми/g,'xiaomi').replace(/ё/g,'е').replace(/(iphone|samsung|xiaomi|galaxy|poco)(?=[a-z0-9])/g,'$1 ').replace(/([a-zа-я])(\d{1,})/gu,'$1 $2').replace(/(\d)([a-zа-я])/gu,'$1 $2').replace(/[^\p{L}\p{N}\s-]/gu,' ').trim().split(/\s+/).filter(Boolean).slice(0,5);}
+ function normalizeQuery(value) {
+  return value.normalize('NFKC').toLowerCase().replace(/ё/g,'е')
+   .replace(/айфон(?:ом|ами|ам|ах|а|у|е|ы)?/g,'iphone')
+   .replace(/самсунг(?:ом|ами|ам|ах|а|у|е|и)?/g,'samsung')
+   .replace(/ксиаоми|сяоми/g,'xiaomi').replace(/редми/g,'redmi');
+ }
+ function safeTerms(q){return normalizeQuery(q).replace(/(iphone|samsung|xiaomi|galaxy|poco|redmi)(?=[a-z0-9])/g,'$1 ').replace(/([a-zа-я])(\d{1,})/gu,'$1 $2').replace(/(\d)([a-zа-я])/gu,'$1 $2').replace(/[^\p{L}\p{N}\s-]/gu,' ').trim().split(/\s+/).filter(Boolean).slice(0,5);}
 function partTerms(value) {
- return value.normalize('NFKC').toLowerCase().replace(/\+/g,' plus ').replace(/ё/g,'е')
-  .replace(/айфон/g,'iphone').replace(/самсунг/g,'samsung').replace(/(?:ксиаоми|сяоми)/g,'xiaomi')
-  .replace(/редми/g,'redmi').replace(/(?:ноут|нот)(?=\s*\d)/g,'note')
+  return normalizeQuery(value).replace(/\+/g,' plus ')
+   .replace(/(?:ноут|нот)(?=\s*\d)/g,'note')
   .replace(/экран(?:ы|а)?/g,'дисплей').replace(/батаре[а-я]*/g,'аккумулятор').replace(/\b(?:iphone|galaxy|redmi)(?=\d)/g,'$& ')
   .replace(/(^|\s)[сs]\s*(?=\d)/g,'$1s').replace(/(^|\s)[аa]\s*(?=\d)/g,'$1a')
   .replace(/(^|\s)(\d+)[асе](?=\s|$)/g,(_,space,n)=>space+n+({а:'a',с:'c',е:'e'})[_.slice(-1)])
@@ -112,11 +117,25 @@ function compareProducts(a,b,sort) {
  else order=Date.parse(b.created_at)-Date.parse(a.created_at);
  return order||a.id.localeCompare(b.id);
 }
+ function requestLink(query) {
+  const link = node('a','Уточнить у мастера','button primary');
+  const electronicsActions = {phones:'1',laptops:'2',computers:'3',accessories:'4'};
+  const normalized = normalizeQuery(query);
+  const guessedCategory = Object.keys(electronicsActions).find(key => categoryMap[key].terms.some(term => normalized.includes(term)));
+  const action = type === 'electronics' && (electronicsActions[category || guessedCategory] || '1');
+  const queryParams = new URLSearchParams({service:action?'devices':'parts',action:action||'4',model:query});
+  link.href = '../?' + queryParams;
+  return link;
+ }
 function showRows(rows,token) {
  if(!rows.length){
   const empty=node('div',undefined,'empty');
   empty.append(node('h3','Нет товаров по запросу'),node('p','Попробуйте другую модель или сбросьте фильтры.'));
-  empty.append(button('Показать все товары',()=>{type='';category='';$('search').value='';setTab();resetFilters();}));
+   const actions = node('div', undefined, 'actions');
+   const query = $('search').value.trim();
+   if (query) actions.append(requestLink(query));
+   actions.append(button('Показать все товары',()=>{type='';category='';$('search').value='';setTab();resetFilters();}));
+   empty.append(actions);
   container.append(empty);
  } else for(const x of rows.slice(0,PAGE))container.append(card(x,token));
  say(rows.length?'Показано: '+Math.min(rows.length,PAGE):'Нет совпадений');
@@ -129,7 +148,15 @@ function showFallback(localRows, sort, start, token) {
   say('Показаны проверенные цены. Остальные товары не загрузились.');
  } else {
   say('Не удалось загрузить каталог. Нажмите «Обновить».');
-  container.append(node('div','Каталог временно недоступен. Свяжитесь с мастером.','empty'));
+   const empty = node('div',undefined,'empty');
+   empty.append(node('p','Каталог временно недоступен. Свяжитесь с мастером.'));
+   const query = $('search').value.trim();
+   if (query) {
+    const actions = node('div',undefined,'actions');
+    actions.append(requestLink(query));
+    empty.append(actions);
+   }
+   container.append(empty);
   $('pager').hidden = page === 0;
   $('prev').disabled = page === 0;
  }
