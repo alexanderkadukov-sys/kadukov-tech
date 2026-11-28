@@ -261,6 +261,106 @@ body .workspace-panel .window-tools .window-minimize { display:none; }
   body .workspace-panel .window-tools .square { width:35px; height:42px; }
   .workspace-content { padding:12px; }
 }
+
+/* Shared surfaces for the home page, service pages and windows. */
+body {
+  --page-base:#edf3f2; --page-light:#f9fbfa; --page-tint:#d5ebe5;
+  --page-cool:#dfe7f1; --page-grid:#205d6410; --panel-shadow:0 12px 30px #173c4b15, 0 2px 6px #173c4b0c;
+}
+body.dark {
+  --page-base:#111d2a; --page-light:#172637; --page-tint:#1d3b42;
+  --page-cool:#222d48; --page-grid:#a0e9df12; --panel-shadow:0 12px 30px #070d1660, 0 2px 6px #070d1638;
+}
+body main#top {
+  background:
+    radial-gradient(ellipse at 15% 0, var(--page-tint), transparent 56%),
+    radial-gradient(ellipse at 100% 9%, var(--page-cool), transparent 53%),
+    linear-gradient(160deg, var(--page-light), var(--page-base));
+}
+body #quickHome { position:relative; isolation:isolate; background:transparent; padding-block:clamp(12px, 2.8vw, 38px) 18px; }
+#quickHome::before {
+  content:""; position:absolute; z-index:-1; inset:0; pointer-events:none;
+  background-image:linear-gradient(var(--page-grid) 1px, transparent 1px), linear-gradient(90deg, var(--page-grid) 1px, transparent 1px);
+  background-size:32px 32px; mask-image:linear-gradient(#000, transparent 77%);
+}
+body #quickHome .hub-grid { gap:clamp(12px, 1.7vw, 24px); }
+body #quickHome .hub-grid > section { border:1px solid #62858d; box-shadow:0 13px 32px #102c4630, inset 0 1px #edfffa2e; }
+#quickHome .hub-workshop::before { background:linear-gradient(18deg,#091c2a 10%,#102738ce 35%,#0d273a10 80%); }
+#quickHome .hub-action { box-shadow:0 4px 12px #031a2490, inset 0 1px #fff8; }
+#quickHome .hub-action:focus-visible { outline:2px solid #d7fff3; outline-offset:3px; }
+body #quickHome .directions-heading { margin-block:clamp(20px, 3vw, 32px) 9px; align-items:center; }
+body #quickHome .directions-heading h2 { flex:1 1 130px; font-size:clamp(1.25rem, 2.5vw, 1.9rem); line-height:1.1; }
+#quickHome .directions-heading a { background:var(--surface); box-shadow:var(--panel-shadow); text-align:center; }
+body #quickHome #serviceStrip { padding:4px 3px 10px; }
+body #quickHome #serviceStrip .quick-service {
+  background:linear-gradient(155deg,#1b4654,#102735 76%); border-color:#426b77;
+  box-shadow:0 4px 8px #183e4c30; transition:border-color .15s, box-shadow .15s;
+}
+body #quickHome #serviceStrip .quick-service:focus-visible { outline:2px solid #74f4d7; outline-offset:-3px; }
+body #quickHome #serviceStrip .quick-service:hover { border-color:#68c4b6; box-shadow:0 5px 10px #183e4c52; }
+body #quickHome #serviceStrip .quick-service::before { border-bottom:1px solid #78c0bc45; }
+body #quickHome #serviceStrip .service-label { min-height:45px; display:grid; place-items:center; padding:7px 4px; }
+body #quickHome .foreign-number-entry { margin-top:3px; }
+body #quickHome .foreign-number-entry .btn { border-color:var(--line); background:var(--page-light); color:var(--blue); text-align:left; }
+body .workshop-trust-grid { border-color:var(--line); border-radius:14px; box-shadow:var(--panel-shadow); }
+body .workshop-trust-grid .workshop-rating { background:linear-gradient(145deg,#e4fbf1,#bee9db); }
+#order.workshop-request .orderbox h2 { letter-spacing:-.035em; }
+body #order.workshop-request #request { background:var(--surface); border:1px solid var(--line); border-radius:16px; box-shadow:var(--panel-shadow); }
+body .service-page-hero { background:transparent; }
+body .workspace-panel { background:linear-gradient(150deg,var(--page-light),var(--page-base)); }
+body .workspace-panel > header { background:var(--surface); border-bottom:1px solid var(--line); }
+body .workspace-panel .window-tools .square { background:var(--soft); box-shadow:inset 0 1px #ffffff35; }
+body .workspace-content :is(.service-option, .site-map a) {
+  background:var(--surface); border:1px solid var(--line); border-radius:12px; box-shadow:0 2px 6px #102a4510;
+}
+body :is(.workspace-content, .service-page) .service-option:is(:hover,:focus-visible),
+body .workspace-content .site-map a:is(:hover,:focus-visible) { border-color:var(--blue); }
+body .workspace-content :is(#quickRequestContent #request, #foreignNumberRequest, #foreignNumberReview, #accountGuest, #accountMember) {
+  background:var(--surface); padding:clamp(10px, 2vw, 20px); border:1px solid var(--line);
+  border-radius:14px; box-shadow:var(--panel-shadow);
+}
+body .workspace-content .site-map { gap:18px; }
+.workspace-content .site-map h3 { color:var(--blue); }
+#priceFilter { margin-bottom:14px; }
+#priceFilter input { min-height:46px; background:var(--surface); }
+#priceCount { margin:6px 0 0; color:var(--muted); font-size:.85rem; }
+.price-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%, 285px),1fr)); gap:9px; }
+body .price-list .quick-result { height:100%; padding:12px 14px; border:1px solid var(--line); border-radius:11px; box-shadow:0 2px 6px #102a4510; }
+body .price-list .quick-result:is(:hover,:focus-visible) { border-color:var(--blue); }
+body .price-list .quick-price-heading { display:grid; justify-content:start; }
+@media (min-width:900px) {
+  body #quickHome #serviceStrip { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+  body #quickHome #serviceStrip .quick-service::before { aspect-ratio:2.6; }
+  body #quickHome #serviceStrip .service-label { font-size:1rem; }
+}
+@media (max-width:700px) {
+  body #quickHome .hub-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); padding:0; border:0; }
+  body #quickHome .hub-grid > section { display:block; min-height:132px; padding:0; border-radius:15px; overflow:hidden; color:white; background:#142d3a; }
+  body #quickHome .hub-grid > section + section { border-top:1px solid #62858d; }
+  body #quickHome .hub-shop::before, body #quickHome .hub-workshop img {
+    position:absolute; inset:0; width:100%; height:100%; border-radius:0; z-index:-2; object-position:center 55%;
+  }
+  body #quickHome .hub-shop::after, body #quickHome .hub-workshop::before {
+    display:block; content:""; position:absolute; inset:0; width:auto; aspect-ratio:auto; transform:none;
+    border:0; border-radius:0; box-shadow:none; z-index:-1; background:linear-gradient(0deg,#091b29 5%,#102a3b75 65%,#102a3b22);
+  }
+  body #quickHome .hub-grid :is(h1,h2) {
+    position:absolute; bottom:11px; left:10px; right:35px; color:#fff;
+    font-size:clamp(1rem, 4.5vw, 1.28rem); line-height:1.12; text-shadow:0 1px 4px #0008;
+  }
+  body #quickHome .hub-grid .hub-action { border-radius:14px; align-items:flex-end; padding:0 8px 8px; box-shadow:none; color:#aaf5e2; }
+  body #quickHome .hub-action span { display:grid; place-items:center; width:26px; height:26px; border:1px solid #aaf5e270; border-radius:50%; background:#102d3d; }
+  body #quickHome .hub-grid .hub-action:focus-visible { outline-offset:-3px; }
+  body #quickHome #serviceStrip .quick-service { flex-basis:clamp(105px, 31%, 190px); }
+}
+@media (max-width:360px) {
+  body #quickHome .directions-heading a { padding-inline:9px; }
+  body #quickHome .hub-grid > section { min-height:116px; }
+  body .workspace-content #quickRequestContent #request { padding:9px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  body #quickHome #serviceStrip .quick-service { transition:none; }
+}
 </style><link rel="stylesheet" href="service-strip.css"><link rel="stylesheet" href="workshop-request.css?v=1"><script src="verified-parts.js?v=1"></script><script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2" integrity="sha384-7i/4BYWz4Mn+lJfg2HWfEPfZQ7tmFKF3CTSKlXBpxWjNlLjcg+T6smpHG4gLmU1u" crossorigin="anonymous"></script></head><body><svg xmlns="http://www.w3.org/2000/svg" style="display:none"><defs>
 <symbol id="toolsIcon" viewBox="0 0 24 24"><path d="M14 7a5 5 0 0 0-6-5l2.5 2.5-1 3-3 1L4 6a5 5 0 0 0 6 6l8 8a2 2 0 0 0 3-3l-8-8a5 5 0 0 0 1-2Z"/></symbol>
 <symbol id="profileIcon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2"/></symbol>
@@ -302,8 +402,7 @@ body .workspace-panel .window-tools .window-minimize { display:none; }
       <a class="hub-action" href="?service=repair" data-page="phone">Обсудить ремонт <span aria-hidden="true">→</span></a></div>
     </section>
   </div>
-  <div class="foreign-number-entry"><a class="btn alt" data-page="foreign-number" href="?service=foreign-number">Подключение сервиса с иностранным номером</a></div>
-  <div class="directions-heading"><h2>Услуги мастерской</h2><a href="?price=1" data-quick-info="prices">Проверенные цены</a><button type="button" id="stripToggle" aria-controls="serviceStrip">Пауза</button></div>
+  <div class="directions-heading"><h2>Услуги мастерской</h2><a href="?price=1" data-quick-info="prices">Проверенные цены</a></div>
   <nav class="quick-directions" aria-label="Направления">
     <div class="primary-services" id="serviceStrip">
       <a class="quick-service" data-page="phone" href="?service=repair">
@@ -320,9 +419,10 @@ body .workspace-panel .window-tools .window-minimize { display:none; }
       <a class="quick-service" data-page="chip" href="?service=ai"><span class="service-label">Нейросети</span></a>
       <a class="quick-service" data-page="study" href="?service=study"><span class="service-label">Учебные проекты</span></a>
       <a class="quick-service" data-page="digital" href="?service=digital"><span class="service-label">Цифровые услуги</span></a>
-      <a class="quick-service" href="#order" data-quick-info="contact"><span class="service-label">Контакты</span></a>
+      <a class="quick-service" href="?info=contact" data-quick-info="contact"><span class="service-label">Контакты</span></a>
     </div>
   </nav>
+  <div class="foreign-number-entry"><a class="btn alt" data-page="foreign-number" href="?service=foreign-number">Подключение сервиса с иностранным номером</a></div>
 </div></section>
 <section class="service-page" id="servicePage" aria-labelledby="servicePageTitle" hidden>
   <div class="service-page-hero">
@@ -398,7 +498,7 @@ body .workspace-panel .window-tools .window-minimize { display:none; }
 <section class="section" id="electronics" hidden><div class="wrap"><div class="sectionhead"><div><div class="eyebrow">02 / ПОДБОР</div><h2>Подберём технику и запчасти.</h2></div><p>Примеры задач по подбору электроники и совместимых запчастей.</p></div><div class="catalogs"><article class="panel catalog-card"><div class="eyebrow">01 / ТЕХНИКА</div><h3>Подбор электроники</h3><p>Смартфоны, ПК, ноутбуки, периферия и аксессуары.</p><div class="tags"><span class="tag">Apple</span><span class="tag">Samsung</span><span class="tag">Xiaomi</span><span class="tag">Новая и б/у</span></div><button class="btn" data-catalog="electronics" data-scroll="true">Варианты подбора</button></article><article class="panel catalog-card" id="parts-catalog"><div class="eyebrow">02 / КОМПЛЕКТУЮЩИЕ</div><h3>Каталог запчастей</h3><p>Дисплеи, аккумуляторы, шлейфы, платы зарядки и другие детали.</p><div class="tags"><span class="tag">По модели</span><span class="tag">Оригинал / аналог</span><span class="tag">Для сервисов</span></div><button class="btn" data-catalog="parts" data-scroll="true">Подобрать запчасть ↗</button></article></div><div class="panel catalog-browser" id="catalog"><div class="tabs"><button data-catalog="electronics" class="active">Электроника</button><button data-catalog="parts">Запчасти</button></div><div class="filters"><input id="search" aria-label="Поиск по каталогу" placeholder="Поиск по названию или модели"><select id="filter" aria-label="Категория"><option value="">Все категории</option></select></div><div class="items" id="items"></div><p class="note">Добавьте подходящий пример в «Мой запрос» или опишите точную модель и нужную деталь.</p></div></div></section>
 <section class="section" id="about"><div class="wrap"><div class="sectionhead"><div><div class="eyebrow">03 / ОБО МНЕ</div><h2>За сайтом — реальный мастер.</h2></div><p>Профессиональный подход, прозрачные условия и индивидуальная работа с каждым клиентом.</p></div><div class="aboutgrid"><article class="panel bio"><h3>Александр Кадуков</h3><p>Занимаюсь ремонтом электроники, подбором техники и комплектующих, а также цифровыми услугами. Опыт работы в DNS, управления сервисным центром и создания AI-контента помогает комплексно решать технические задачи.</p><div class="timeline"><div><b>2019–2022 · DNS</b><small>Работа с цифровой и бытовой техникой</small></div><div><b>С 2022 · Сервисный центр</b><small>Ремонт электроники и руководство сервисом</small></div><div><b>С 2024 · Цифровые услуги</b><small>Видеомонтаж и AI-контент</small></div></div></article><article class="panel steps"><h3>Как обсудить задачу</h3><ol><li><div><b>Расскажите о задаче</b><small>Модель устройства, неисправность или желаемый товар.</small></div></li><li><div><b>Согласуем стоимость</b><small>Уточним стоимость, сроки и формат работы.</small></div></li><li><div><b>Выполню работу</b><small>Ремонт, сборка, подбор техники или цифровая услуга.</small></div></li><li><div><b>Получите результат</b><small>Личная встреча или дистанционная консультация по договорённости.</small></div></li></ol></article></div></div></section>
 
-<section class="section faq" id="delivery" hidden><div class="wrap"><div class="sectionhead"><div><div class="eyebrow">05 / УСЛОВИЯ</div><h2>Условия работы.</h2></div></div><details><summary>Можно ли обратиться из другого города?</summary><p>Подбор техники, консультации и цифровые услуги можно обсудить дистанционно. Если для работы нужна личная встреча или передача устройства, согласуем это заранее.</p></details><details><summary>Как оплачиваются ремонт и цифровые услуги?</summary><p>Стоимость ремонта согласуется до выполнения работ, оплата после выполнения, если не оговорено иное. Для цифровых услуг стоимость зависит от объёма и сложности. Возможность поэтапной оплаты обсуждается заранее.</p></details><details><summary>Как проверить совместимость запчасти?</summary><p>Укажите точную модель устройства, при необходимости артикул и маркировку. Объясню, как проверить совместимость, тип детали и маркировку.</p></details><details><summary>Восстанавливаете доступ к аккаунтам?</summary><p>Помогаю законным владельцам создавать и восстанавливать доступ к Apple Account и Google официальными способами. Условия подписок и настройки сервисов уточняются индивидуально.</p></details></div></section></main><footer><div class="wrap foot"><div class="footlinks"><a href="?view=map" data-site-view="map">Карта сайта</a><a href="?view=map" data-quick-info="payment">Условия работы</a><a href="?view=map" data-quick-info="contact">Контакты</a><a href="account-privacy.html">Данные кабинета</a></div><small>© 2026</small></div></footer><div class="mobilebar"><a class="btn alt" href="tel:+79156484238">Позвонить</a><a class="btn alt" href="https://t.me/Kaduk0v" target="_blank" rel="noopener">Telegram</a><a class="btn" href="#order" data-focus>Описать задачу</a></div><dialog class="modal quick-dialog" id="cartDialog" aria-labelledby="cartDialogTitle"><header><h2 id="cartDialogTitle" tabindex="-1">Мой запрос</h2><button type="button" class="square" id="closeCart" data-close-quick aria-label="Закрыть">×</button></header><p class="muted">Выбранные позиции можно приложить к описанию задачи.</p><div id="cartItems"></div><button class="btn" id="checkout" style="margin-top:16px;width:100%">Добавить к задаче</button></dialog><div class="toast hide" id="toast" role="status"></div>
+<section class="section faq" id="delivery" hidden><div class="wrap"><div class="sectionhead"><div><div class="eyebrow">05 / УСЛОВИЯ</div><h2>Условия работы.</h2></div></div><details><summary>Можно ли обратиться из другого города?</summary><p>Подбор техники, консультации и цифровые услуги можно обсудить дистанционно. Если для работы нужна личная встреча или передача устройства, согласуем это заранее.</p></details><details><summary>Как оплачиваются ремонт и цифровые услуги?</summary><p>Стоимость ремонта согласуется до выполнения работ, оплата после выполнения, если не оговорено иное. Для цифровых услуг стоимость зависит от объёма и сложности. Возможность поэтапной оплаты обсуждается заранее.</p></details><details><summary>Как проверить совместимость запчасти?</summary><p>Укажите точную модель устройства, при необходимости артикул и маркировку. Объясню, как проверить совместимость, тип детали и маркировку.</p></details><details><summary>Восстанавливаете доступ к аккаунтам?</summary><p>Помогаю законным владельцам создавать и восстанавливать доступ к Apple Account и Google официальными способами. Условия подписок и настройки сервисов уточняются индивидуально.</p></details></div></section></main><footer><div class="wrap foot"><div class="footlinks"><a href="?view=map" data-site-view="map">Карта сайта</a><a href="?info=payment" data-quick-info="payment">Условия работы</a><a href="?info=contact" data-quick-info="contact">Контакты</a><a href="account-privacy.html">Данные кабинета</a></div><small>© 2026</small></div></footer><div class="mobilebar"><a class="btn alt" href="tel:+79156484238">Позвонить</a><a class="btn alt" href="https://t.me/Kaduk0v" target="_blank" rel="noopener">Telegram</a><a class="btn" href="#order" data-focus>Описать задачу</a></div><dialog class="modal quick-dialog" id="cartDialog" aria-labelledby="cartDialogTitle"><header><h2 id="cartDialogTitle" tabindex="-1">Мой запрос</h2><button type="button" class="square" id="closeCart" data-close-quick aria-label="Закрыть">×</button></header><p class="muted">Выбранные позиции можно приложить к описанию задачи.</p><div id="cartItems"></div><button class="btn" id="checkout" style="margin-top:16px;width:100%">Добавить к задаче</button></dialog><div class="toast hide" id="toast" role="status"></div>
 <dialog class="modal quick-dialog" id="quickRequestDialog" aria-labelledby="quickRequestTitle">
 <header><h2 id="quickRequestTitle" tabindex="-1">Опишите задачу</h2><button type="button" class="square" data-close-quick aria-label="Закрыть">×</button></header>
 <div id="quickRequestContent"></div></dialog>
@@ -409,6 +509,10 @@ body .workspace-panel .window-tools .window-minimize { display:none; }
   <a class="contact-number" href="tel:+79156484238"><span>Позвонить в мастерскую</span><strong>+7 (915) 648-42-38</strong></a>
   <p>Ежедневно с 10:00 до 21:00<br>Москва · встреча по договорённости</p>
 </section>
+<div id="priceFilter" hidden>
+  <label class="field" for="priceQuery"><span class="field-title">Найти модель или деталь в прайсе</span><input type="search" id="priceQuery" placeholder="Например, экран Samsung S10" maxlength="120" autocomplete="off"></label>
+  <p id="priceCount" role="status"></p>
+</div>
 <div class="quick-info-answer" id="quickInfoAnswer"></div>
 <button type="button" id="quickInfoBack" data-quick-info hidden>Все вопросы</button>
 <div class="quick-info-footer"><a class="btn alt" href="tel:+79156484238">Позвонить</a><a class="btn alt" href="https://t.me/Kaduk0v" target="_blank" rel="noopener">Telegram</a><a class="btn alt" href="https://vk.ru/phoneugra" target="_blank" rel="noopener">ВКонтакте</a><a class="btn" id="quickInfoRequest" href="#order" data-focus>Описать задачу</a></div>
@@ -644,7 +748,7 @@ try {
 try {
   const draft = JSON.parse(sessionStorage.getItem(draftKey) || '{}');
   if (opts.includes(draft?.service)) service.value = draft.service;
-  if (pageKey && typeof draft?.action === 'string') selectedAction = draft.action.slice(0, 100);
+  if (typeof draft?.action === 'string') selectedAction = draft.action.slice(0, 100);
   if (typeof draft?.message === 'string') message.value = draft.message.slice(0, 1500);
   for (const key of Object.keys(guides)) {
     if (typeof draft?.contexts?.[key] === 'string') contexts[key] = draft.contexts[key].slice(0, 140);
@@ -701,6 +805,8 @@ function chooseService(value) {
   if (service.value === value || !opts.includes(value)) return;
   saveDraft();
   service.value = value;
+  selectedAction = '';
+  renderServiceAction();
   updateGuide();
   clearFeedback();
   saveDraft();
@@ -838,10 +944,8 @@ request.addEventListener('input', event => {
   saveDraft();
 });
 service.addEventListener('change', () => {
-  if (pageKey && service.value !== servicePages[pageKey].service) {
-    selectedAction = '';
-    renderServiceAction();
-  }
+  selectedAction = '';
+  renderServiceAction();
   updateGuide();
   saveDraft();
 });
@@ -956,7 +1060,7 @@ const servicePages = {
     title: 'Подбор техники',
     icon: 'shop',
     intro: 'Помогу сравнить смартфоны, ноутбуки и другие устройства по вашим задачам и бюджету.',
-    examples: './catalog/?type=electronics',
+    examples: 'catalog/?type=electronics',
     actions: [
       ['Подобрать смартфон', 'Сравним камеру, батарею, экран и объём памяти.'],
       ['Подобрать ноутбук', 'Учтём программы, вес, автономность и размер экрана.'],
@@ -969,7 +1073,7 @@ const servicePages = {
     title: 'Подбор запчастей',
     icon: 'parts',
     intro: 'Помогу подобрать дисплей, аккумулятор, шлейф или другую деталь по модели устройства.',
-    examples: './catalog/?type=parts',
+    examples: 'catalog/?type=parts',
     actions: [
       ['Дисплей или сенсор', 'Подбор по точной модели устройства и типу матрицы.'],
       ['Аккумулятор', 'Проверка совместимости по модели и маркировке.'],
@@ -1025,6 +1129,11 @@ function renderServiceAction() {
   });
 }
 
+if (!Object.values(servicePages).some(page => page.service === service.value && page.actions.some(([name]) => name === selectedAction))) {
+  selectedAction = '';
+}
+renderServiceAction();
+
 function openServicePage() {
   const page = servicePages[pageKey];
   const direction = servicePages[pageKey].service;
@@ -1049,7 +1158,7 @@ function openServicePage() {
     button.append(label, hint);
     if (linkedService) {
       button.href = '?service=' + linkedService;
-      button.dataset.page = linkedService;
+      button.dataset.route = '';
       return button;
     }
     button.type = 'button';
@@ -1207,6 +1316,12 @@ function leaveWindow(side, discard = false, focusHome = true) {
   }
 }
 
+function rememberWindowScroll(key) {
+  if (activeWindow && activeWindow.key !== key) {
+    activeWindow.scrollTop = activeWindow.dialog.querySelector('.workspace-content').scrollTop;
+  }
+}
+
 function quickDialog(dialog, {key = dialog.id, restore = () => quickDialog(dialog)} = {}) {
   const top = scrollY;
   const opener = document.activeElement;
@@ -1216,11 +1331,7 @@ function quickDialog(dialog, {key = dialog.id, restore = () => quickDialog(dialo
   const heading = dialog.querySelector('h2');
   const content = dialog.querySelector('.workspace-content');
   const sameWindow = activeWindow?.key === key;
-  const sharedDialog = activeWindow?.dialog === dialog;
-  if (!sameWindow && activeWindow) {
-    if (sharedDialog) activeWindow.scrollTop = content.scrollTop;
-    else leaveWindow(null, false, false);
-  }
+  if (activeWindow && activeWindow.dialog !== dialog) leaveWindow(null, false, false);
   const tab = workspaceTabs.get(key) || {key, dialog, side: 'right', opener, scrollTop: 0};
   Object.assign(tab, {label: heading.textContent, restore});
   workspaceTabs.set(key, tab);
@@ -1239,7 +1350,9 @@ function openQuickRequest() {
 }
 
 function openStorefront(href = 'catalog/') {
-  if (storefrontFrame.getAttribute('src') !== href) storefrontFrame.src = href;
+  const frameUrl = new URL(href, location.href);
+  frameUrl.searchParams.set('embedded', '1');
+  if (storefrontFrame.src !== frameUrl.href) storefrontFrame.src = frameUrl.href;
   quickDialog(storefrontDialog, {restore: () => openStorefront(href)});
 }
 
@@ -1411,12 +1524,21 @@ storefrontFrame.addEventListener('load', () => {
   frameDocument.addEventListener('click', event => {
     const link = event.target.closest('a[href]');
     if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
-    if (link.href !== new URL('./', location.href).href) return;
+    const url = new URL(link.href);
+    const home = new URL('./', location.href);
+    if (url.origin !== home.origin || url.pathname !== home.pathname || link.target === '_blank') return;
+    const route = directions.find(item => item.href === '?service=' + url.searchParams.get('service'));
+    if (route) {
+      event.preventDefault();
+      if (!openRequestForAction(route.key, url.searchParams.get('action'), url.searchParams.get('model'))) openServiceWindow(route.key);
+      return;
+    }
+    if (url.search || url.hash) return;
     event.preventDefault();
     leaveWindow();
   });
   frameDocument.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && !event.defaultPrevented) leaveWindow();
+    if (event.key === 'Escape' && !event.defaultPrevented && !frameDocument.querySelector('dialog[open]')) leaveWindow();
   });
 });
 
@@ -1532,9 +1654,40 @@ topics.push({
   key: 'prices', title: 'Прайс на технику и запчасти',
   summary: 'Проверенные цены и уточнение наличия',
   keywords: 'прайс цена цены стоимость сколько стоит техника детали'
+}, {
+  key: 'status', title: 'Как узнать статус заявки',
+  summary: 'Личная ссылка на заявку и обновление статуса',
+  keywords: 'статус заявки номер готовность заявки заказ отслеживание когда готово',
+  facts: [
+    'Откройте личную ссылку, которую получили при создании заявки, и нажмите «Обновить статус».',
+    'Если вы отправили мастеру сообщение без номера заявки, уточните ход работы в том же чате.'
+  ]
 });
 
+const priceQuery = $('#priceQuery');
+function renderPriceList() {
+  const query = priceQuery.value.trim();
+  const exactParts = priceMatches(query).filter(result => result.info).map(result => result.info);
+  const words = meaningfulWords(query).filter(word => !['купить', 'кутить', 'цена', 'цену', 'найти'].includes(word));
+  const matching = priceEntries.filter(product => {
+    const searchable = meaningfulWords([product.name, product.variant, product.details, product.keywords].join(' '));
+    return exactParts.includes(product.id) || words.every(word => bestMatch(word, searchable) >= (word.length <= 3 || /^\d/.test(word) ? 3 : 2));
+  });
+  const results = document.createElement('div');
+  results.className = 'price-list';
+  results.append(...matching.map(product => resultControl(priceResult(product))));
+  if (!matching.length) {
+    const ask = resultControl({title: 'Уточнить у мастера', description: 'Проверим совместимость, цену и наличие.', href: requestUrl('parts', 4, query)});
+    results.append(ask);
+  }
+  $('#priceCount').textContent = matching.length ? 'Позиций: ' + matching.length : 'В проверенном прайсе совпадений нет.';
+  $('#quickInfoAnswer').replaceChildren(results);
+}
+priceQuery.addEventListener('input', renderPriceList);
+
 function openQuickInfo(key) {
+  const windowKey = 'info:' + (key || '');
+  rememberWindowScroll(windowKey);
   const showContacts = key === 'contact';
   quickInfoDialog.classList.toggle('contact-sheet', showContacts);
   $('#contactDetails').hidden = !showContacts;
@@ -1542,10 +1695,11 @@ function openQuickInfo(key) {
   const product = priceEntries.find(value => value.id === key);
   const topic = topics.find(value => value.key === key);
   const isPriceList = key === 'prices';
-  $('#quickInfoTitle').textContent = product?.name || topic?.title || (isPriceList ? 'Проверенные цены' : 'Быстрая информация');
+  $('#quickInfoTitle').textContent = isPriceList ? 'Проверенные цены' : product?.name || topic?.title || 'Быстрая информация';
   $('#quickInfoIndex').hidden = Boolean(topic || product);
+  $('#priceFilter').hidden = !isPriceList;
   const back = $('#quickInfoBack');
-  back.hidden = !topic && !product;
+  back.hidden = isPriceList || (!topic && !product);
   back.dataset.quickInfo = product ? 'prices' : '';
   back.textContent = product ? 'Весь прайс' : 'Все вопросы';
   const requestLink = $('#quickInfoRequest');
@@ -1556,8 +1710,7 @@ function openQuickInfo(key) {
   requestLink.textContent = product ? 'Уточнить наличие' : 'Описать задачу';
   const lines = product ? [rubles.format(product.price), product.variant, product.details,
     product.part && !product.details ? partPriceDetails : '',
-    'Цена проверена ' + (product.checked || priceDate) + '. Уточните наличие.'] :
-    isPriceList ? ['Дата проверки указана в карточке каждой позиции.'] : (topic?.facts || []);
+    'Цена проверена ' + (product.checked || priceDate) + '. Уточните наличие.'] : (topic?.facts || []);
   const paragraphs = lines.filter(Boolean).map((text, index) => {
     const paragraph = document.createElement('p');
     paragraph.textContent = text;
@@ -1566,9 +1719,9 @@ function openQuickInfo(key) {
     if (product && text.startsWith('Цена проверена ')) paragraph.className = 'price-date';
     return paragraph;
   });
-  const priceButtons = isPriceList ? priceEntries.map(product => resultControl(priceResult(product))) : [];
-  $('#quickInfoAnswer').replaceChildren(...priceButtons, ...paragraphs);
-  quickDialog(quickInfoDialog, {key: 'info:' + (key || ''), restore: () => openQuickInfo(key)});
+  if (isPriceList) renderPriceList();
+  else $('#quickInfoAnswer').replaceChildren(...paragraphs);
+  quickDialog(quickInfoDialog, {key: windowKey, restore: () => openQuickInfo(key)});
 }
 
 for (const topic of topics) {
@@ -1581,6 +1734,7 @@ for (const topic of topics) {
 }
 
 document.addEventListener('click', event => {
+  if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
   const info = event.target.closest('[data-quick-info]');
   const examples = event.target.closest('[data-quick-catalog]');
   if (info) {
@@ -1613,6 +1767,9 @@ function openServiceWindow(key) {
   }
   const page = servicePages[key];
   const route = directions.find(item => item.key === key);
+  if (!page || !route) return;
+  const windowKey = 'service:' + key;
+  rememberWindowScroll(windowKey);
   $('#serviceDialogTitle').textContent = page.title;
   $('#serviceDialogIntro').textContent = page.intro;
   const options = page.actions.map(([title, description, linkedService], index) => {
@@ -1628,12 +1785,12 @@ function openServiceWindow(key) {
     return link;
   });
   $('#serviceDialogOptions').replaceChildren(...options);
-  quickDialog(serviceDialog, {key: 'service:' + key, restore: () => openServiceWindow(key)});
+  quickDialog(serviceDialog, {key: windowKey, restore: () => openServiceWindow(key)});
 }
 
 workspacePickerItems.append(
   ...directions.map(({key, label}) => workspaceButton(key === 'foreign-number' ? 'Иностранный номер' : label, () => openServiceWindow(key))),
-  workspaceButton('Каталог', () => openStorefront(storefrontFrame.getAttribute('src') || 'catalog/')),
+  workspaceButton('Каталог', () => (workspaceTabs.get(storefrontDialog.id)?.restore || openStorefront)()),
   workspaceButton('Описать задачу', openQuickRequest),
   workspaceButton('Проверенные цены', () => openQuickInfo('prices')),
   workspaceButton('Контакты', () => openQuickInfo('contact')),
@@ -1642,17 +1799,18 @@ workspacePickerItems.append(
 );
 
 const mapGroups = [
-  ['Ремонт и техника', ['phone', 'pc', 'parts', 'shop']],
+  ['Ремонт и техника', ['phone', 'pc', 'parts', 'shop', {label: 'Каталог техники и запчастей', href: 'catalog/'}]],
   ['Обучение и помощь', ['chip', 'study', 'digital', 'foreign-number']],
   ['Цены и условия', [
     {label: 'Проверенные цены', href: '?price=1', info: 'prices'},
-    {label: 'Оплата и условия', href: '?view=map', info: 'payment'},
-    {label: 'Совместимость запчастей', href: '?view=map', info: 'compatibility'},
+    {label: 'Оплата и условия', href: '?info=payment', info: 'payment'},
+    {label: 'Совместимость запчастей', href: '?info=compatibility', info: 'compatibility'},
   ]],
   ['Контакты и кабинет', [
-    {label: 'Связаться с мастером', href: '?view=map', info: 'contact'},
-    {label: 'О мастере', href: '?view=map', info: 'about'},
+    {label: 'Связаться с мастером', href: '?info=contact', info: 'contact'},
+    {label: 'О мастере', href: '?info=about', info: 'about'},
     {label: 'Описать задачу', href: '#order', request: true},
+    {label: 'Статус заявки', href: '?info=status', info: 'status'},
     {label: 'Личный кабинет', href: '?view=account', view: 'account'},
   ]],
 ];
@@ -1740,6 +1898,8 @@ const actionQueries = {
 const searchEntries = topics.map(topic => ({
   title: topic.title, description: topic.summary, keywords: topic.keywords, info: topic.key
 }));
+searchEntries.push({title: 'Каталог техники и запчастей', description: 'Поиск по модели, артикулу и категории',
+  keywords: 'каталог ассортимент список товары витрина запчасти электроника', href: 'catalog/'});
 for (const route of directions) {
   const page = servicePages[route.key];
   searchEntries.push({
@@ -1843,8 +2003,9 @@ const indexed = searchEntries.map(entry => ({
   words: meaningfulWords(entry.keywords)
 }));
 const searchIntents = [
-  [/иностранн|зарубежн\S* (?:сим|номер)|\b(?:esim|sim)\b|(?:смс|sms|whatsapp|ватсап) (?:код|подтвержд)|(?:код|подтвержд\S*) (?:(?:в|по|через) )?(?:whatsapp|ватсап)/, '?service=foreign-number'],
-  [/часы работ|режим работ|график работ|во сколько (?:откры|работ)|номер телефон|как связаться|где находит/, 'contact'],
+  [/иностранн|зарубежн\S* (?:сим|номер)|\b(?:esim|sim)\b|(?:смс|sms|whatsapp|ватсап) (?:не приходит )?(?:код|подтвержд)|(?:код|подтвержд\S*) (?:(?:в|по|через) )?(?:whatsapp|ватсап)|(?:не приходит код).*(?:whatsapp|ватсап)/, '?service=foreign-number'],
+  [/часы работ|режим работ|график работ|во сколько (?:откры|работ)|номер телефон|скажи телефон|как связаться|где находит/, 'contact'],
+  [/статус (?:моей )?заявки|отследить (?:заказ|заявку)|заявка готова/, 'status'],
   [/не заряжа|не держит заряд|быстро разряжа|замен\S* (?:аккумулятор|батаре)/, '?service=repair&action=3'],
   [/не включа|зависает|не запускает|перезагружа/, '?service=repair&action=1'],
   [/(?:разби[лт]\S*|замен\S*|тресну\S*) (?:экран|дисплей|стекло)|(?:экран|дисплей) (?:разби|тресну)/, '?service=repair&action=2'],
@@ -2375,8 +2536,11 @@ if (accountPreview) {
 }
 const previewParams = new URLSearchParams(location.search);
 const priceParam = previewParams.get('price');
+const infoParam = previewParams.get('info');
 if (priceParam === '1' || priceEntries.some(product => product.id === priceParam)) {
   openQuickInfo(priceParam === '1' ? 'prices' : priceParam);
+} else if (topics.some(topic => topic.key === infoParam)) {
+  openQuickInfo(infoParam);
 } else if (previewParams.get('view') === 'map') {
   quickDialog(siteMapDialog);
 } else if (previewParams.get('view') === 'account' || accountCallback) {
@@ -2384,34 +2548,4 @@ if (priceParam === '1' || priceEntries.some(product => product.id === priceParam
 } else if (serviceParam === 'foreign-number') {
   openServiceWindow(serviceParam);
 }
-</script><script>
-(() => {
-  const strip = document.getElementById('serviceStrip');
-  const toggle = document.getElementById('stripToggle');
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let paused = reduced.matches;
-  let touching = false;
-  let resumeAt = 0;
-  function showState() {
-    toggle.textContent = paused ? 'Автопрокрутка' : 'Пауза';
-    toggle.setAttribute('aria-label', paused ? 'Включить автопрокрутку' : 'Приостановить автопрокрутку');
-  }
-  toggle.onclick = () => { paused = !paused; showState(); };
-  showState();
-  strip.addEventListener('pointerdown', () => { touching = true; });
-  function release() { if (touching) resumeAt = Date.now() + 1500; touching = false; }
-  window.addEventListener('pointerup', release);
-  window.addEventListener('pointercancel', release);
-  strip.addEventListener('wheel', () => { resumeAt = Date.now() + 1500; }, {passive:true});
-  setInterval(() => {
-    if (paused || touching || document.hidden || Date.now() < resumeAt || strip.matches(':focus-within') || document.querySelector('dialog[open]')) return;
-    const rect = strip.getBoundingClientRect();
-    if (!rect.width || rect.bottom <= 0 || rect.top >= innerHeight) return;
-    const limit = strip.scrollWidth - strip.clientWidth;
-    if (limit < 2) return;
-    const step = strip.children[1].offsetLeft - strip.children[0].offsetLeft;
-    const next = strip.scrollLeft >= limit - 2 ? 0 : Math.min(limit,(Math.round(strip.scrollLeft / step) + 1) * step);
-    strip.scrollTo({left:next, behavior:next && !reduced.matches ? 'smooth' : 'instant'});
-  }, 1000);
-})();
 </script><script src="repair-request.js?v=1" defer></script></body></html>
